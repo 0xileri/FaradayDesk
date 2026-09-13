@@ -1,0 +1,17 @@
+{
+  "asset": "NVDA",
+  "symbol": "RNVDAUSDT",
+  "category": "SPOT",
+  "quote": "USDT",
+  "retrievedAt": "2026-09-13T02:49:11.778Z",
+  "timestamp": 1789267756476,
+  "last": 219.24,
+  "bid": 219.25,
+  "ask": 219.27,
+  "spreadPercent": 0.009121590805441136,
+  "bidDepthUSDT": 21696.924975,
+  "askDepthUSDT": 592222.982393,
+  "levels": 20,
+  "source": "https://www.bitget.com/docs/catalog/market/market-data",
+  "limitations": "Public venue snapshot, not an executable quote or underlying-stock fair value. Displayed depth covers at most 20 levels per side. No issuer, redemption, USDT peg, slippage or probability assessment."
+}

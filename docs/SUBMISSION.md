@@ -48,3 +48,6 @@ Claude Sonnet 4.6 interprets the selected historical case and disclosed market c
 - Post the approved X draft, then add its real URL. No post has been sent by the agent.
 - Optionally record the two-minute walkthrough; a written full research task is prepared. Do not claim a video exists until it does.
 - Review the completed form and submit before the deadline. The form has not been submitted.
+
+## Current blockers — update before submission
+The repository is public. The demo remains owner-private pending explicit public-audience approval. The deployed Bitget feed returns HTTP 403; local data integration works, and the UI offers an optional dated validation snapshot rather than claiming live quotes. Hosted Claude research works without unavailable market context. Include this limitation in Part 4 unless it has been resolved; the materials are not yet a valid complete entry because public demo access and the X post remain outstanding.

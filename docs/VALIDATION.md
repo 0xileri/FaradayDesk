@@ -33,3 +33,6 @@ An initial local check after adding D1 failed while the development environment 
 Recruit five relevant retail traders for two unaided tasks each. Target ≥9/10 completions and median task time under 90 seconds, while separately measuring source review. Require correct privacy explanation, identification of an unsupported inference and correct export.
 
 Activation target: 4/5 complete a first worksheet. Retention target: 3/5 return within seven days. No observed human users, retention, AUM, volume, incremental fees, returns, Sharpe, win rate or risk reduction is claimed.
+
+## Hosted integration limitation
+The deployed Claude route passed an owner-authenticated research check with source attachment. Bitget public market requests from the deployed server returned HTTP 403, confirmed in Worker diagnostics; the same integration succeeded locally. Therefore hosted live market availability is not claimed. The UI offers an explicitly dated NVDA validation snapshot as optional recorded evidence; it is not a live quote. AI omits market context when its live fetch fails. Resolving the hosted Bitget restriction remains outstanding. Public audience approval is pending; the demo is currently owner-private.

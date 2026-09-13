@@ -44,3 +44,6 @@ Eleven automated checks cover arithmetic, disclosure, market validation and usag
 
 ## Architecture
 React 19, TypeScript, vinext/Vite, Cloudflare Worker API routes, D1 counter, public Bitget UTA v3 market API, server-side Claude. Bitget Agent MCP was used to discover and verify instruments during development. The deployed app calls the public API directly; it does not host the MCP or Bitget Signal skills.
+
+## Current hosting status
+The demo is currently owner-private pending public-audience approval. Hosted Claude research works. Bitget returns HTTP 403 to the hosted server, although local market integration passes. The app reports the failure and optionally shows a dated NVDA validation snapshot, explicitly not live. AI omits unavailable market context. Do not submit the demo as publicly accessible until access is approved.

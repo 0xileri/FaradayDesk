@@ -1,0 +1,14 @@
+node_modules
+.git
+.env
+.env.*
+.sites-runtime
+.railway-data
+.wrangler
+.agents
+.codex
+dist
+railway-dist
+outputs
+work
+*.tsbuildinfo

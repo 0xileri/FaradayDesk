@@ -47,3 +47,8 @@ React 19, TypeScript, vinext/Vite, Cloudflare Worker API routes, D1 counter, pub
 
 ## Current hosting status
 The demo is currently owner-private pending public-audience approval. Hosted Claude research works. Bitget returns HTTP 403 to the hosted server, although local market integration passes. The app reports the failure and optionally shows a dated NVDA validation snapshot, explicitly not live. AI omits unavailable market context. Do not submit the demo as publicly accessible until access is approved.
+
+## Redesign and Railway target
+The September 2026 redesign adds a responsive marketing/research split, a live local scenario preview, an orange hexagon field visual, a shield-style disclosure switch, research-flow navigation, outlined type and reduced-motion-aware animation. Existing inputs, arithmetic, source cases, request fields and exports are preserved.
+
+For Railway, use `npm run build:railway` and follow [deployment instructions](docs/RAILWAY.md). The Node server shares the existing API handlers and uses a persistent SQLite volume for the usage counter. The original Sites deployment is already public; earlier private-access notes above describe its previous status. A Railway URL will be recorded only after successful deployment.

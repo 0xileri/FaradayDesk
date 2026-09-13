@@ -11,7 +11,9 @@
     "build": "node scripts/run-framework.mjs build",
     "start": "node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js dev --config dist/server/wrangler.json --local --persist-to .wrangler/state --ip 127.0.0.1 --inspector-port 0",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "build:railway": "vite build --config vite.railway.config.ts && vite build --config vite.railway.config.ts --ssr server/railway.ts",
+    "start:railway": "node railway-dist/server/railway.js"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -64,5 +66,8 @@
     "miniflare": {
       "sharp": "0.35.4"
     }
+  },
+  "optionalDependencies": {
+    "@rolldown/binding-win32-arm64-msvc": "^1.0.1"
   }
 }

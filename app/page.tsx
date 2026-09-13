@@ -1,37 +1,1010 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { Shield, Hexagon, ArrowUpRight, Activity, LockKeyhole, FlaskConical, Download, ChevronRight, Check, BookOpen, Eye, SlidersHorizontal, AlertTriangle } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Checkbox } from '@/components/ui/checkbox';
-import { cases, makePayload, calculate } from '@/lib/stress';
-import { instruments, type MarketSnapshot, type Asset } from '@/lib/market';
-import validationSnapshot from '@/lib/validation-snapshot.json';
+import { useState, useEffect } from "react";
+import { DeskHero } from "@/components/desk-hero";
+import {
+  Shield,
+  Hexagon,
+  ArrowUpRight,
+  Activity,
+  LockKeyhole,
+  FlaskConical,
+  Download,
+  ChevronRight,
+  Check,
+  BookOpen,
+  Eye,
+  SlidersHorizontal,
+  AlertTriangle,
+} from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cases, makePayload, calculate } from "@/lib/stress";
+import { instruments, type MarketSnapshot, type Asset } from "@/lib/market";
+import validationSnapshot from "@/lib/validation-snapshot.json";
 
-export default function Home(){
- const [active,setActive]=useState(0),[size,setSize]=useState(5000),[shock,setShock]=useState(8),[cost,setCost]=useState(.5),[budget,setBudget]=useState(500);
- const [cage,setCage]=useState(true),[reveal,setReveal]=useState(true),[notes,setNotes]=useState('My private thesis: accumulate before the cash-market open. I want to understand what would invalidate my conviction.'),[asset,setAsset]=useState('NVDA'),[tab,setTab]=useState('stress'),[checked,setChecked]=useState<string[]>([]),[report,setReport]=useState(''),[busy,setBusy]=useState(false),[status,setStatus]=useState(''),[ready,setReady]=useState(false);
- const [market,setMarket]=useState<MarketSnapshot|null>(null),[marketStatus,setMarketStatus]=useState('Refresh to fetch a public Bitget snapshot.'),[marketBusy,setMarketBusy]=useState(false),[recorded,setRecorded]=useState(false),[question,setQuestion]=useState('Challenge my hypothetical long position. What evidence is missing, and what would invalidate the thesis?');
- const [clockNow,setClockNow]=useState(Date.now());
- useEffect(()=>{const timer=setInterval(()=>setClockNow(Date.now()),15000);return()=>clearInterval(timer);},[]);
- const scenario=cases[active]; const result=calculate(size,shock,cost,budget); const payload={...makePayload(asset,scenario.id,cage,reveal,notes,size),question};
- useEffect(()=>{fetch('/api/research').then(r=>r.json()).then((d: unknown)=>setReady(Boolean((d as {configured?: boolean}).configured))).catch(()=>{});},[]);
- useEffect(()=>{ const mc=(document as unknown as {modelContext?:{registerTool:Function}}).modelContext; if(!mc)return;const controller=new AbortController();Promise.resolve(mc.registerTool({name:'calculate_stress_loss',description:'Calculate hypothetical long tokenized-spot loss without reading private notes or sending data.',inputSchema:{type:'object',properties:{notional:{type:'number',minimum:0},shockPercent:{type:'number',minimum:0,maximum:100},costPercent:{type:'number',minimum:0,maximum:100}},required:['notional','shockPercent','costPercent'],additionalProperties:false},annotations:{readOnlyHint:true},execute:(v:unknown)=>{const a=v as Record<string,number>;if(!a||Object.keys(a).some(k=>!['notional','shockPercent','costPercent'].includes(k))||![a.notional,a.shockPercent,a.costPercent].every(Number.isFinite)||a.notional<0||a.shockPercent<0||a.shockPercent>100||a.costPercent<0||a.costPercent>100)throw Error('Invalid scenario values');return calculate(a.notional,a.shockPercent,a.costPercent,500);}},{signal:controller.signal})).catch(()=>{});return()=>controller.abort();},[]);
- function choose(i:number){setActive(i);setShock(cases[i].shock);setChecked([]);setReport('');setStatus('');}
- async function refreshMarket(){setRecorded(false);setMarketBusy(true);setMarket(null);try{const r=await fetch('/api/market?asset='+encodeURIComponent(asset));const d=await r.json() as MarketSnapshot & {error?:string};if(!r.ok)throw Error(d.error);setMarket(d);setMarketStatus('Snapshot fetched. Refresh before use; prices and depth can change.');}catch(e){setMarketStatus(e instanceof Error?e.message:'Market data unavailable.');}finally{setMarketBusy(false);}}
- async function research(){setBusy(true);setStatus('');setReport('');try{const r=await fetch('/api/research',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json() as {error?:string;text:string};if(!r.ok)throw Error(d.error||'Research unavailable');setReport('Research context: '+payload.asset+' / '+scenario.short+'\n\n'+d.text);setStatus('Research complete. Verify the interpretation against the sources.');}catch(e){setStatus(e instanceof Error?e.message:'Research unavailable');}finally{setBusy(false);}}
- function download(){const data={title:'FaradayDesk stress worksheet',createdAt:new Date().toISOString(),asset,scenario:scenario.title,assumptions:{notional:size,adverseMovePercent:shock,roundTripCostPercent:cost,lossBudget:budget},result,source:scenario.url,marketSnapshot:market,marketSnapshotRecorded:recorded,quoteCurrency:'USDT',limitations:'Hypothetical unleveraged long spot scenario. Any attached snapshot may be stale. No execution or estimated probability. Private notes excluded.',checklistCompleted:checked,aiCommentaryIncluded:false};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='faradaydesk-stress-worksheet.json';a.click();URL.revokeObjectURL(url);setStatus('Worksheet exported. Private notes were excluded.');}
- return <div className="desk"><header className="topbar"><a className="brand" href="/" aria-label="FaradayDesk home"><span className="brandmark"><Hexagon/><span>F</span></span>Faraday<span className="brandthin">Desk</span><small>RESEARCH LAB</small></a><div className="topright"><span className="mode"><FlaskConical size={14}/> Scenario workspace</span><span className="avatar">IB</span></div></header>
- <main><div className="pageheading"><div><div className="eyebrow">YOUR EDGE. UNDER YOUR CONTROL.</div><h1>Before the open.</h1><p>Put your trade thesis under pressure before you put capital behind it.</p></div><button className="secondary" onClick={download}><Download size={16}/>Export worksheet</button></div>
- <div className="workspace"><aside className="inputs"><div className="sectionhead"><span className="sectionnumber">01</span><h2>Your trade thesis</h2><LockKeyhole size={15}/></div><div className="inputbody"><label htmlFor="asset">Underlying ticker <span>Public context</span></label><div className="tickerinput"><span className="asseticon">↗</span><select id="asset" disabled={marketBusy||busy} value={asset} onChange={e=>{setAsset(e.target.value);setReport('');setMarket(null);}}>{Object.entries(instruments).map(([ticker,symbol])=><option key={ticker} value={ticker}>{ticker} · {symbol}</option>)}</select><span>USDT</span></div><p className="fieldnote">Bitget stock-token spot · hypothetical long position</p><label htmlFor="notional">Position notional <LockKeyhole size={12}/></label><div className="moneyinput"><span>₮</span><input id="notional" type="number" min="0" max="1000000" value={size} onChange={e=>setSize(Math.min(1000000,Math.max(0,Number(e.target.value)||0)))}/><span>USDT</span></div><label htmlFor="notes">Private thesis <LockKeyhole size={12}/></label><textarea id="notes" value={notes} maxLength={5000} onChange={e=>{setNotes(e.target.value);setReport('');}}/><div className="cagebox"><div><Shield size={18}/><strong>Faraday cage</strong><Switch aria-label="Faraday cage" checked={cage} onCheckedChange={v=>{setCage(v);setReport('');}}/></div><p>{cage?'Private notes and position size stay in this browser.':'Cage off: notes and position size will be included if you request AI research.'}</p><button onClick={()=>setTab('privacy')}>Inspect disclosure <ChevronRight size={14}/></button></div><div className="localnote"><LockKeyhole size={13}/>No orders. No saved private notes.</div></div><div className="casepicker"><div className="eyebrow">LOAD A STRESS LENS</div>{cases.map((c,i)=><button key={c.id} className={i===active?'selected':''} onClick={()=>choose(i)}><span className="casenum">0{i+1}</span><span>{c.short}<small>{c.category}</small></span><ChevronRight size={15}/></button>)}</div></aside>
- <section className="analysis"><div className="analysishead"><div><span className="sectionnumber">02</span><h2>Decision stress test</h2></div><span className="outlinebadge">HYPOTHETICAL STRESS</span></div><Tabs value={tab} onValueChange={setTab}><TabsList className="desktabs" variant="line"><TabsTrigger value="stress"><Activity size={15}/>Stress overview</TabsTrigger><TabsTrigger value="evidence"><BookOpen size={15}/>Historical context</TabsTrigger><TabsTrigger value="privacy"><Shield size={15}/>Disclosure</TabsTrigger></TabsList>
- <TabsContent value="stress"><div className="stressintro"><div><span className="eyebrow orange">{scenario.category.toUpperCase()}</span><h3>{scenario.title}</h3><p>{scenario.summary}</p></div><div className="assessment"><AlertTriangle size={20}/><strong>{result.loss>budget?'Above budget':'Within budget'}</strong><span>At your chosen shock</span></div></div><div className="metrics"><div><span>Scenario loss</span><strong className="orange">−₮{result.loss.toLocaleString(undefined,{maximumFractionDigits:0})}</strong><small>Including assumed costs</small></div><div><span>Adverse price move</span><strong>−{shock.toFixed(1)}<em>%</em></strong><small>Assumption, not a forecast</small></div><div><span>{recorded?'Recorded spread':'Snapshot spread'}</span><strong className="unknown">{market?.spreadPercent!=null?market.spreadPercent.toFixed(3)+'%':'Unknown'}</strong><small>{market?'Timestamped venue observation':'Refresh market context below'}</small></div></div>
- <div className="marketpanel"><div className="charttitle"><h4>Bitget · {instruments[asset as Asset]} · SPOT</h4><button className="secondary" disabled={marketBusy} onClick={refreshMarket}>{marketBusy?'Fetching…':'Refresh market context'}</button></div><p className="fieldnote" role="status">{marketStatus}</p>{!market&&asset==='NVDA'&&<button className="secondary" onClick={()=>{setMarket(validationSnapshot as MarketSnapshot);setRecorded(true);setMarketStatus('Recorded validation evidence from 13 September 2026. Not a current or executable quote. AI will attempt its own live fetch and omit market context if unavailable.');}}>View recorded NVDA validation snapshot</button>}{market&&<>{clockNow-market.timestamp>120000&&<p role="status" className="orange">This snapshot is stale. Refresh before using it.</p>}{recorded&&<p className="orange"><strong>RECORDED VALIDATION SNAPSHOT · NOT LIVE</strong></p>}<p>Last: {market.last} USDT · Bid: {market.bid} · Ask: {market.ask}</p><p>Displayed depth ({market.levels} levels): bids {market.bidDepthUSDT.toFixed(0)} USDT · asks {market.askDepthUSDT.toFixed(0)} USDT</p><p className="fieldnote">Source timestamp: {new Date(market.timestamp).toISOString()} · Retrieved: {market.retrievedAt}</p><p className="fieldnote">{market.limitations}</p></>}<p className="fieldnote">Refresh sends only the selected ticker to our server and Bitget. Notes and size are excluded. <a href="https://www.bitget.com/docs/catalog/market/market-data" target="_blank" rel="noreferrer">API source ↗</a></p></div><div className="chartpanel"><div className="charttitle"><h4>How much downside can you absorb?</h4><span><i/>Hypothetical loss curve</span></div><svg className="losschart" viewBox="0 0 680 165" role="img" aria-label={`Loss increases with adverse move. At ${shock} percent, loss is ${result.loss} USDT.`}><defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ff7f00" stopOpacity=".24"/><stop offset="1" stopColor="#ff7f00" stopOpacity="0"/></linearGradient></defs>{[20,60,100,140].map(y=><line key={y} x1="35" y1={y} x2="655" y2={y} stroke="#2a2d30" strokeDasharray="3 5"/>)}<path d="M35 140 L655 20 L655 150 L35 150 Z" fill="url(#fill)"/><path d="M35 140 L655 20" fill="none" stroke="#ff7f00" strokeWidth="2"/><line x1={35+shock/30*620} y1="14" x2={35+shock/30*620} y2="145" stroke="#a6a9ae" strokeDasharray="4 4"/><circle cx={35+shock/30*620} cy={140-shock/30*120} r="5" fill="#ff7f00" stroke="#181a1d" strokeWidth="3"/>{[0,5,10,15,20,25,30].map((n,i)=><text key={n} x={35+i/6*620} y="163" textAnchor="middle" fill="#969a9f" fontSize="12">{n}%</text>)}</svg><div className="sliderlabel"><label>Adverse move</label><strong>{shock.toFixed(1)}%</strong></div><Slider aria-label="Adverse price move percent" value={[shock]} onValueChange={v=>setShock(v[0])} min={0} max={30} step={.5}/><div className="assumptions"><label>Round-trip costs (%)<input aria-label="Round-trip cost percent" type="number" min="0" max="10" step=".1" value={cost} onChange={e=>setCost(Math.min(10,Math.max(0,+e.target.value||0)))}/></label><label>Loss budget (USDT)<input aria-label="Loss budget" type="number" min="0" value={budget} onChange={e=>setBudget(Math.max(0,+e.target.value||0))}/></label><div><span>Notional at this budget</span><strong>{result.maxNotional===null?'No finite limit':`₮${result.maxNotional.toLocaleString(undefined,{maximumFractionDigits:0})}`}</strong></div></div><p className="fieldnote">Loss = notional × (adverse move + costs). Unleveraged long spot only; excludes issuer failure, USDT depeg and liquidation mechanics. Amounts are USDT; costs are assumed, not derived from the book.</p></div>
- <div className="bottomgrid"><div className="factorpanel"><h4>What needs checking</h4>{[['Event exposure',scenario.factor],['Reference price','Cash close is not a live fair value'],['Execution conditions',market?'Review timestamped spread and limited displayed depth':'Refresh to inspect spread and displayed depth']].map(([a,b])=><div className="factor" key={a}><span>{a}</span><p>{b}</p></div>)}</div><div className="checkpanel"><h4>Before you decide</h4>{scenario.checks.map((s,i)=><label key={s}><Checkbox checked={checked.includes(s)} onCheckedChange={v=>setChecked(v?[...checked,s]:checked.filter(x=>x!==s))} aria-label={s}/><span>{s}</span></label>)}<small>{checked.length} of {scenario.checks.length} reviewed</small></div></div></TabsContent>
- <TabsContent value="evidence"><div className="evidenceintro"><span className="eyebrow orange">CURATED HISTORICAL CONTEXT</span><h3>Comparable mechanisms. Different markets.</h3><p>These events inform questions to ask. They are not matched rToken returns or a probability model.</p></div>{cases.map((c,i)=><article className="evidencecard" key={c.id}><div className="evidencedate">{c.date}<span>PRIMARY SOURCE</span></div><div><h4>{c.historical}</h4><p>{c.fact}</p><div className="compare"><p><strong>Why it matters</strong>{c.relevance}</p><p><strong>Where it differs</strong>{c.limit}</p></div><a href={c.url} target="_blank" rel="noreferrer">{c.publisher}<ArrowUpRight size={14}/></a><button className="textbutton" onClick={()=>{choose(i);setTab('stress');}}>Use this stress lens →</button></div></article>)}</TabsContent>
- <TabsContent value="privacy"><div className="evidenceintro"><span className="eyebrow orange">THE FARADAY CAGE</span><h3>See exactly what leaves your desk.</h3><p>With the cage on, your full private notes and position size are excluded—not rewritten or guessed at.</p></div><div className="privacycolumns"><div><h4><LockKeyhole size={15}/>Private · this browser</h4><pre>{notes||'No private notes entered.'}</pre><div className="privatesize">Position: ₮{size.toLocaleString()}</div></div><div><h4><Eye size={15}/>Request preview · outgoing fields</h4><pre>{JSON.stringify(payload,null,2)}</pre></div></div><label className="reveal"><Switch checked={reveal} onCheckedChange={v=>{setReveal(v);setReport('');}} aria-label="Share public ticker"/><span>Include public ticker in research context</span></label><p className="privacyexplain">Only an explicit AI research request sends these fields to the server. The server adds the selected historical case, a fixed instruction and a fresh Bitget snapshot when the ticker is disclosed. When the ticker is hidden, no market snapshot is fetched or sent to AI. The public question is always shared: do not put private details in it. Your private notes are held in memory and disappear on refresh. Provider retention policies still apply; disclosure controls are not a guarantee of anonymity.</p></TabsContent>
- </Tabs><div className="publicquestion"><label htmlFor="question">Public research question · sent to AI</label><textarea id="question" maxLength={1000} value={question} onChange={e=>{setQuestion(e.target.value);setReport('');}}/><p className="fieldnote">Keep private details in the private thesis field. Shared AI demo allowance: 25 calls per UTC day, 200 total. Inspect Disclosure before sending.</p></div><div className="researchbar"><div><span className="aiicon">✳</span><div><strong>Explore the counter-thesis</strong><p>{ready?'Ask AI to interpret the sourced case and challenge the disclosed thesis.':'Local scenario engine ready. Cloud AI is not connected yet.'}</p></div></div><button className="primary" disabled={busy||!ready||!asset||!question.trim()} onClick={research}>{busy?'Researching…':'Request AI research'}<ArrowUpRight size={16}/></button></div>{status&&<p className="status" role="status">{status}</p>}{report&&<article className="aireport"><h4>AI interpretation · verify against sources</h4><div>{report}</div></article>}</section></div><footer><span><Hexagon size={14}/> FARADAYDESK <span className="footsep">/</span> Ileri Builds</span><span>Evidence before conviction.</span><span>Research worksheet · Human decisions</span></footer></main></div>
+export default function Home() {
+  const [active, setActive] = useState(0),
+    [size, setSize] = useState(5000),
+    [shock, setShock] = useState(8),
+    [cost, setCost] = useState(0.5),
+    [budget, setBudget] = useState(500);
+  const [cage, setCage] = useState(true),
+    [reveal, setReveal] = useState(true),
+    [notes, setNotes] = useState(
+      "My private thesis: accumulate before the cash-market open. I want to understand what would invalidate my conviction.",
+    ),
+    [asset, setAsset] = useState("NVDA"),
+    [tab, setTab] = useState("stress"),
+    [checked, setChecked] = useState<string[]>([]),
+    [report, setReport] = useState(""),
+    [busy, setBusy] = useState(false),
+    [status, setStatus] = useState(""),
+    [ready, setReady] = useState(false);
+  const [market, setMarket] = useState<MarketSnapshot | null>(null),
+    [marketStatus, setMarketStatus] = useState(
+      "Refresh to fetch a public Bitget snapshot.",
+    ),
+    [marketBusy, setMarketBusy] = useState(false),
+    [recorded, setRecorded] = useState(false),
+    [question, setQuestion] = useState(
+      "Challenge my hypothetical long position. What evidence is missing, and what would invalidate the thesis?",
+    );
+  const [clockNow, setClockNow] = useState(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setClockNow(Date.now()), 15000);
+    return () => clearInterval(timer);
+  }, []);
+  const scenario = cases[active];
+  const result = calculate(size, shock, cost, budget);
+  const payload = {
+    ...makePayload(asset, scenario.id, cage, reveal, notes, size),
+    question,
+  };
+  useEffect(() => {
+    fetch("/api/research")
+      .then((r) => r.json())
+      .then((d: unknown) =>
+        setReady(Boolean((d as { configured?: boolean }).configured)),
+      )
+      .catch(() => {});
+  }, []);
+  useEffect(() => {
+    const mc = (
+      document as unknown as { modelContext?: { registerTool: Function } }
+    ).modelContext;
+    if (!mc) return;
+    const controller = new AbortController();
+    Promise.resolve(
+      mc.registerTool(
+        {
+          name: "calculate_stress_loss",
+          description:
+            "Calculate hypothetical long tokenized-spot loss without reading private notes or sending data.",
+          inputSchema: {
+            type: "object",
+            properties: {
+              notional: { type: "number", minimum: 0 },
+              shockPercent: { type: "number", minimum: 0, maximum: 100 },
+              costPercent: { type: "number", minimum: 0, maximum: 100 },
+            },
+            required: ["notional", "shockPercent", "costPercent"],
+            additionalProperties: false,
+          },
+          annotations: { readOnlyHint: true },
+          execute: (v: unknown) => {
+            const a = v as Record<string, number>;
+            if (
+              !a ||
+              Object.keys(a).some(
+                (k) => !["notional", "shockPercent", "costPercent"].includes(k),
+              ) ||
+              ![a.notional, a.shockPercent, a.costPercent].every(
+                Number.isFinite,
+              ) ||
+              a.notional < 0 ||
+              a.shockPercent < 0 ||
+              a.shockPercent > 100 ||
+              a.costPercent < 0 ||
+              a.costPercent > 100
+            )
+              throw Error("Invalid scenario values");
+            return calculate(a.notional, a.shockPercent, a.costPercent, 500);
+          },
+        },
+        { signal: controller.signal },
+      ),
+    ).catch(() => {});
+    return () => controller.abort();
+  }, []);
+  function choose(i: number) {
+    setActive(i);
+    setShock(cases[i].shock);
+    setChecked([]);
+    setReport("");
+    setStatus("");
+  }
+  async function refreshMarket() {
+    setRecorded(false);
+    setMarketBusy(true);
+    setMarket(null);
+    try {
+      const r = await fetch("/api/market?asset=" + encodeURIComponent(asset));
+      const d = (await r.json()) as MarketSnapshot & { error?: string };
+      if (!r.ok) throw Error(d.error);
+      setMarket(d);
+      setMarketStatus(
+        "Snapshot fetched. Refresh before use; prices and depth can change.",
+      );
+    } catch (e) {
+      setMarketStatus(
+        e instanceof Error ? e.message : "Market data unavailable.",
+      );
+    } finally {
+      setMarketBusy(false);
+    }
+  }
+  async function research() {
+    setBusy(true);
+    setStatus("");
+    setReport("");
+    try {
+      const r = await fetch("/api/research", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const d = (await r.json()) as { error?: string; text: string };
+      if (!r.ok) throw Error(d.error || "Research unavailable");
+      setReport(
+        "Research context: " +
+          payload.asset +
+          " / " +
+          scenario.short +
+          "\n\n" +
+          d.text,
+      );
+      setStatus(
+        "Research complete. Verify the interpretation against the sources.",
+      );
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : "Research unavailable");
+    } finally {
+      setBusy(false);
+    }
+  }
+  function download() {
+    const data = {
+      title: "FaradayDesk stress worksheet",
+      createdAt: new Date().toISOString(),
+      asset,
+      scenario: scenario.title,
+      assumptions: {
+        notional: size,
+        adverseMovePercent: shock,
+        roundTripCostPercent: cost,
+        lossBudget: budget,
+      },
+      result,
+      source: scenario.url,
+      marketSnapshot: market,
+      marketSnapshotRecorded: recorded,
+      quoteCurrency: "USDT",
+      limitations:
+        "Hypothetical unleveraged long spot scenario. Any attached snapshot may be stale. No execution or estimated probability. Private notes excluded.",
+      checklistCompleted: checked,
+      aiCommentaryIncluded: false,
+    };
+    const url = URL.createObjectURL(
+      new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
+    );
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "faradaydesk-stress-worksheet.json";
+    a.click();
+    URL.revokeObjectURL(url);
+    setStatus("Worksheet exported. Private notes were excluded.");
+  }
+  return (
+    <div className="desk">
+      <header className="topbar">
+        <a className="brand" href="/" aria-label="FaradayDesk home">
+          <span className="brandmark">
+            <Hexagon />
+            <span>F</span>
+          </span>
+          Faraday<span className="brandthin">Desk</span>
+          <small>RESEARCH LAB</small>
+        </a>
+        <nav className="navlinks" aria-label="Main navigation">
+          <a href="#workspace">The desk</a>
+          <a href="#method">The method</a>
+          <a href="#research" onClick={() => setTab("privacy")}>
+            Disclosure
+          </a>
+        </nav>
+        <span className="mode" data-on={cage}>
+          <span className="signal-dot" />
+          {cage ? "Cage on" : "Cage off"}
+        </span>
+      </header>
+      <main>
+        <DeskHero
+          loss={result.loss}
+          shock={shock}
+          cost={cost}
+          cage={cage}
+          onDisclosure={() => {
+            setTab("privacy");
+            document
+              .getElementById("research")
+              ?.scrollIntoView({ behavior: "instant" });
+          }}
+        />
+        <section className="method-strip" id="method">
+          <span className="outline-word" aria-hidden="true">
+            HUMAN DECIDES
+          </span>
+          <div className="method-heading">
+            <span className="eyebrow">THE FARADAY METHOD</span>
+            <h2>
+              Evidence before
+              <br />
+              conviction.
+            </h2>
+          </div>
+          <div className="method-item">
+            <span>01 / DISCLOSE LESS</span>
+            <p>
+              Keep private notes local.
+              <br />
+              Inspect what leaves your desk.
+            </p>
+          </div>
+          <div className="method-item">
+            <span>02 / QUESTION MORE</span>
+            <p>
+              Stress the assumption.
+              <br />
+              Verify the evidence.
+            </p>
+          </div>
+          <div className="method-item">
+            <span>03 / OWN THE DECISION</span>
+            <p>
+              AI challenges the thesis.
+              <br />
+              You make the call.
+            </p>
+          </div>
+        </section>
+        <div className="pageheading" id="workspace">
+          <div>
+            <div className="eyebrow">
+              THE WORKSPACE / RESEARCH, NOT EXECUTION
+            </div>
+            <h2>
+              Conviction under pressure<span>.</span>
+            </h2>
+          </div>
+          <button className="secondary" onClick={download}>
+            <Download size={16} />
+            Export worksheet
+          </button>
+        </div>
+        <div className="workspace">
+          <nav className="flowrail" aria-label="Research flow">
+            <button
+              title="Thesis"
+              aria-label="Thesis"
+              onClick={() => {
+                document.getElementById("asset")?.focus();
+              }}
+            >
+              <span>01</span>
+              <small>Thesis</small>
+            </button>
+            <button
+              title="Stress"
+              aria-label="Stress"
+              onClick={() => {
+                setTab("stress");
+                document
+                  .getElementById("research")
+                  ?.scrollIntoView({ behavior: "instant" });
+              }}
+            >
+              <span>02</span>
+              <small>Stress</small>
+            </button>
+            <button
+              title="Evidence"
+              aria-label="Evidence"
+              onClick={() => {
+                setTab("evidence");
+                document
+                  .getElementById("research")
+                  ?.scrollIntoView({ behavior: "instant" });
+              }}
+            >
+              <span>03</span>
+              <small>Evidence</small>
+            </button>
+            <button
+              title="Disclosure"
+              aria-label="Disclosure"
+              onClick={() => {
+                setTab("privacy");
+                document
+                  .getElementById("research")
+                  ?.scrollIntoView({ behavior: "instant" });
+              }}
+            >
+              <span>04</span>
+              <small>Disclosure</small>
+            </button>
+            <button
+              title="AI"
+              aria-label="AI"
+              onClick={() => {
+                document.getElementById("question")?.focus();
+              }}
+            >
+              <span>05</span>
+              <small>AI</small>
+            </button>
+            <button
+              title="Export"
+              aria-label="Export"
+              onClick={() => {
+                download();
+              }}
+            >
+              <span>06</span>
+              <small>Export</small>
+            </button>
+          </nav>
+          <aside className="inputs">
+            <div className="sectionhead">
+              <span className="sectionnumber">01</span>
+              <h2>Your trade thesis</h2>
+              <LockKeyhole size={15} />
+            </div>
+            <div className="inputbody">
+              <label htmlFor="asset">
+                Underlying ticker <span>Public context</span>
+              </label>
+              <div className="tickerinput">
+                <span className="asseticon">↗</span>
+                <select
+                  id="asset"
+                  disabled={marketBusy || busy}
+                  value={asset}
+                  onChange={(e) => {
+                    setAsset(e.target.value);
+                    setReport("");
+                    setMarket(null);
+                  }}
+                >
+                  {Object.entries(instruments).map(([ticker, symbol]) => (
+                    <option key={ticker} value={ticker}>
+                      {ticker} · {symbol}
+                    </option>
+                  ))}
+                </select>
+                <span>USDT</span>
+              </div>
+              <p className="fieldnote">
+                Bitget stock-token spot · hypothetical long position
+              </p>
+              <label htmlFor="notional">
+                Position notional <LockKeyhole size={12} />
+              </label>
+              <div className="moneyinput">
+                <span>₮</span>
+                <input
+                  id="notional"
+                  type="number"
+                  min="0"
+                  max="1000000"
+                  value={size}
+                  onChange={(e) =>
+                    setSize(
+                      Math.min(
+                        1000000,
+                        Math.max(0, Number(e.target.value) || 0),
+                      ),
+                    )
+                  }
+                />
+                <span>USDT</span>
+              </div>
+              <label htmlFor="notes">
+                Private thesis <LockKeyhole size={12} />
+              </label>
+              <textarea
+                id="notes"
+                value={notes}
+                maxLength={5000}
+                onChange={(e) => {
+                  setNotes(e.target.value);
+                  setReport("");
+                }}
+              />
+              <div className="cagebox" data-enabled={cage}>
+                <span className="cage-watermark" aria-hidden="true">
+                  {cage ? "CAGE ON" : "CAGE OFF"}
+                </span>
+                <div>
+                  <Shield size={18} />
+                  <strong>Faraday cage</strong>
+                  <Switch
+                    aria-label="Faraday cage"
+                    checked={cage}
+                    onCheckedChange={(v) => {
+                      setCage(v);
+                      setReport("");
+                    }}
+                  />
+                </div>
+                <p>
+                  {cage
+                    ? "Private notes and position size stay in this browser."
+                    : "Cage off: notes and position size will be included if you request AI research."}
+                </p>
+                <button onClick={() => setTab("privacy")}>
+                  Inspect disclosure <ChevronRight size={14} />
+                </button>
+              </div>
+              <div className="localnote">
+                <LockKeyhole size={13} />
+                No orders. No saved private notes.
+              </div>
+            </div>
+            <div className="casepicker">
+              <div className="eyebrow">LOAD A STRESS LENS</div>
+              {cases.map((c, i) => (
+                <button
+                  key={c.id}
+                  className={i === active ? "selected" : ""}
+                  onClick={() => choose(i)}
+                >
+                  <span className="casenum">0{i + 1}</span>
+                  <span>
+                    {c.short}
+                    <small>{c.category}</small>
+                  </span>
+                  <ChevronRight size={15} />
+                </button>
+              ))}
+            </div>
+          </aside>
+          <section className="analysis" id="research">
+            <div className="analysishead">
+              <div>
+                <span className="sectionnumber">02</span>
+                <h2>Decision stress test</h2>
+              </div>
+              <span className="outlinebadge">HYPOTHETICAL STRESS</span>
+            </div>
+            <Tabs value={tab} onValueChange={setTab}>
+              <TabsList className="desktabs" variant="line">
+                <TabsTrigger value="stress">
+                  <Activity size={15} />
+                  Stress overview
+                </TabsTrigger>
+                <TabsTrigger value="evidence">
+                  <BookOpen size={15} />
+                  Historical context
+                </TabsTrigger>
+                <TabsTrigger value="privacy">
+                  <Shield size={15} />
+                  Disclosure
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="stress">
+                <div className="stressintro">
+                  <div>
+                    <span className="eyebrow orange">
+                      {scenario.category.toUpperCase()}
+                    </span>
+                    <h3>{scenario.title}</h3>
+                    <p>{scenario.summary}</p>
+                  </div>
+                  <div className="assessment">
+                    <AlertTriangle size={20} />
+                    <strong>
+                      {result.loss > budget ? "Above budget" : "Within budget"}
+                    </strong>
+                    <span>At your chosen shock</span>
+                  </div>
+                </div>
+                <div className="metrics">
+                  <div>
+                    <span>Scenario loss</span>
+                    <strong className="orange">
+                      −₮
+                      {result.loss.toLocaleString(undefined, {
+                        maximumFractionDigits: 0,
+                      })}
+                    </strong>
+                    <small>Including assumed costs</small>
+                  </div>
+                  <div>
+                    <span>Adverse price move</span>
+                    <strong>
+                      −{shock.toFixed(1)}
+                      <em>%</em>
+                    </strong>
+                    <small>Assumption, not a forecast</small>
+                  </div>
+                  <div>
+                    <span>
+                      {recorded ? "Recorded spread" : "Snapshot spread"}
+                    </span>
+                    <strong className="unknown">
+                      {market?.spreadPercent != null
+                        ? market.spreadPercent.toFixed(3) + "%"
+                        : "Unknown"}
+                    </strong>
+                    <small>
+                      {market
+                        ? "Timestamped venue observation"
+                        : "Refresh market context below"}
+                    </small>
+                  </div>
+                </div>
+                <div className="marketpanel">
+                  <div className="charttitle">
+                    <h4>Bitget · {instruments[asset as Asset]} · SPOT</h4>
+                    <button
+                      className="secondary"
+                      disabled={marketBusy}
+                      onClick={refreshMarket}
+                    >
+                      {marketBusy ? "Fetching…" : "Refresh market context"}
+                    </button>
+                  </div>
+                  <p className="fieldnote" role="status">
+                    {marketStatus}
+                  </p>
+                  {!market && asset === "NVDA" && (
+                    <button
+                      className="secondary"
+                      onClick={() => {
+                        setMarket(validationSnapshot as MarketSnapshot);
+                        setRecorded(true);
+                        setMarketStatus(
+                          "Recorded validation evidence from 13 September 2026. Not a current or executable quote. AI will attempt its own live fetch and omit market context if unavailable.",
+                        );
+                      }}
+                    >
+                      View recorded NVDA validation snapshot
+                    </button>
+                  )}
+                  {market && (
+                    <>
+                      {clockNow - market.timestamp > 120000 && (
+                        <p role="status" className="orange">
+                          This snapshot is stale. Refresh before using it.
+                        </p>
+                      )}
+                      {recorded && (
+                        <p className="orange">
+                          <strong>
+                            RECORDED VALIDATION SNAPSHOT · NOT LIVE
+                          </strong>
+                        </p>
+                      )}
+                      <p>
+                        Last: {market.last} USDT · Bid: {market.bid} · Ask:{" "}
+                        {market.ask}
+                      </p>
+                      <p>
+                        Displayed depth ({market.levels} levels): bids{" "}
+                        {market.bidDepthUSDT.toFixed(0)} USDT · asks{" "}
+                        {market.askDepthUSDT.toFixed(0)} USDT
+                      </p>
+                      <p className="fieldnote">
+                        Source timestamp:{" "}
+                        {new Date(market.timestamp).toISOString()} · Retrieved:{" "}
+                        {market.retrievedAt}
+                      </p>
+                      <p className="fieldnote">{market.limitations}</p>
+                    </>
+                  )}
+                  <p className="fieldnote">
+                    Refresh sends only the selected ticker to our server and
+                    Bitget. Notes and size are excluded.{" "}
+                    <a
+                      href="https://www.bitget.com/docs/catalog/market/market-data"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      API source ↗
+                    </a>
+                  </p>
+                </div>
+                <div className="chartpanel">
+                  <div className="charttitle">
+                    <h4>How much downside can you absorb?</h4>
+                    <span>
+                      <i />
+                      Hypothetical loss curve
+                    </span>
+                  </div>
+                  <svg
+                    className="losschart"
+                    viewBox="0 0 680 165"
+                    role="img"
+                    aria-label={`Loss increases with adverse move. At ${shock} percent, loss is ${result.loss} USDT.`}
+                  >
+                    <defs>
+                      <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+                        <stop
+                          offset="0"
+                          stopColor="#ff7f00"
+                          stopOpacity=".24"
+                        />
+                        <stop offset="1" stopColor="#ff7f00" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    {[20, 60, 100, 140].map((y) => (
+                      <line
+                        key={y}
+                        x1="35"
+                        y1={y}
+                        x2="655"
+                        y2={y}
+                        stroke="#2a2d30"
+                        strokeDasharray="3 5"
+                      />
+                    ))}
+                    <path
+                      d="M35 140 L655 20 L655 150 L35 150 Z"
+                      fill="url(#fill)"
+                    />
+                    <path
+                      className="draw-curve"
+                      d="M35 140 L655 20"
+                      fill="none"
+                      stroke="#ff7f00"
+                      strokeWidth="2"
+                    />
+                    <line
+                      x1={35 + (shock / 30) * 620}
+                      y1="14"
+                      x2={35 + (shock / 30) * 620}
+                      y2="145"
+                      stroke="#a6a9ae"
+                      strokeDasharray="4 4"
+                    />
+                    <circle
+                      cx={35 + (shock / 30) * 620}
+                      cy={140 - (shock / 30) * 120}
+                      r="5"
+                      fill="#ff7f00"
+                      stroke="#181a1d"
+                      strokeWidth="3"
+                    />
+                    {[0, 5, 10, 15, 20, 25, 30].map((n, i) => (
+                      <text
+                        key={n}
+                        x={35 + (i / 6) * 620}
+                        y="163"
+                        textAnchor="middle"
+                        fill="#969a9f"
+                        fontSize="12"
+                      >
+                        {n}%
+                      </text>
+                    ))}
+                  </svg>
+                  <div className="sliderlabel">
+                    <label>Adverse move</label>
+                    <strong>{shock.toFixed(1)}%</strong>
+                  </div>
+                  <Slider
+                    aria-label="Adverse price move percent"
+                    value={[shock]}
+                    onValueChange={(v) => setShock(v[0])}
+                    min={0}
+                    max={30}
+                    step={0.5}
+                  />
+                  <div className="assumptions">
+                    <label>
+                      Round-trip costs (%)
+                      <input
+                        aria-label="Round-trip cost percent"
+                        type="number"
+                        min="0"
+                        max="10"
+                        step=".1"
+                        value={cost}
+                        onChange={(e) =>
+                          setCost(
+                            Math.min(10, Math.max(0, +e.target.value || 0)),
+                          )
+                        }
+                      />
+                    </label>
+                    <label>
+                      Loss budget (USDT)
+                      <input
+                        aria-label="Loss budget"
+                        type="number"
+                        min="0"
+                        value={budget}
+                        onChange={(e) =>
+                          setBudget(Math.max(0, +e.target.value || 0))
+                        }
+                      />
+                    </label>
+                    <div>
+                      <span>Notional at this budget</span>
+                      <strong>
+                        {result.maxNotional === null
+                          ? "No finite limit"
+                          : `₮${result.maxNotional.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+                      </strong>
+                    </div>
+                  </div>
+                  <p className="fieldnote">
+                    Loss = notional × (adverse move + costs). Unleveraged long
+                    spot only; excludes issuer failure, USDT depeg and
+                    liquidation mechanics. Amounts are USDT; costs are assumed,
+                    not derived from the book.
+                  </p>
+                </div>
+                <div className="bottomgrid">
+                  <div className="factorpanel">
+                    <h4>What needs checking</h4>
+                    {[
+                      ["Event exposure", scenario.factor],
+                      [
+                        "Reference price",
+                        "Cash close is not a live fair value",
+                      ],
+                      [
+                        "Execution conditions",
+                        market
+                          ? "Review timestamped spread and limited displayed depth"
+                          : "Refresh to inspect spread and displayed depth",
+                      ],
+                    ].map(([a, b]) => (
+                      <div className="factor" key={a}>
+                        <span>{a}</span>
+                        <p>{b}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="checkpanel">
+                    <h4>Before you decide</h4>
+                    {scenario.checks.map((s, i) => (
+                      <label key={s}>
+                        <Checkbox
+                          checked={checked.includes(s)}
+                          onCheckedChange={(v) =>
+                            setChecked(
+                              v
+                                ? [...checked, s]
+                                : checked.filter((x) => x !== s),
+                            )
+                          }
+                          aria-label={s}
+                        />
+                        <span>{s}</span>
+                      </label>
+                    ))}
+                    <small>
+                      {checked.length} of {scenario.checks.length} reviewed
+                    </small>
+                  </div>
+                </div>
+              </TabsContent>
+              <TabsContent value="evidence">
+                <div className="evidenceintro">
+                  <span className="eyebrow orange">
+                    CURATED HISTORICAL CONTEXT
+                  </span>
+                  <h3>Comparable mechanisms. Different markets.</h3>
+                  <p>
+                    These events inform questions to ask. They are not matched
+                    rToken returns or a probability model.
+                  </p>
+                </div>
+                {cases.map((c, i) => (
+                  <article className="evidencecard" key={c.id}>
+                    <div className="evidencedate">
+                      {c.date}
+                      <span>PRIMARY SOURCE</span>
+                    </div>
+                    <div>
+                      <h4>{c.historical}</h4>
+                      <p>{c.fact}</p>
+                      <div className="compare">
+                        <p>
+                          <strong>Why it matters</strong>
+                          {c.relevance}
+                        </p>
+                        <p>
+                          <strong>Where it differs</strong>
+                          {c.limit}
+                        </p>
+                      </div>
+                      <a href={c.url} target="_blank" rel="noreferrer">
+                        {c.publisher}
+                        <ArrowUpRight size={14} />
+                      </a>
+                      <button
+                        className="textbutton"
+                        onClick={() => {
+                          choose(i);
+                          setTab("stress");
+                        }}
+                      >
+                        Use this stress lens →
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </TabsContent>
+              <TabsContent value="privacy">
+                <div className="evidenceintro">
+                  <span className="eyebrow orange">THE FARADAY CAGE</span>
+                  <h3>See exactly what leaves your desk.</h3>
+                  <p>
+                    With the cage on, your full private notes and position size
+                    are excluded—not rewritten or guessed at.
+                  </p>
+                </div>
+                <div className="privacycolumns">
+                  <div>
+                    <h4>
+                      <LockKeyhole size={15} />
+                      Private · this browser
+                    </h4>
+                    <pre>{notes || "No private notes entered."}</pre>
+                    <div className="privatesize">
+                      Position: ₮{size.toLocaleString()}
+                    </div>
+                  </div>
+                  <div>
+                    <h4>
+                      <Eye size={15} />
+                      Request preview · outgoing fields
+                    </h4>
+                    <pre>{JSON.stringify(payload, null, 2)}</pre>
+                  </div>
+                </div>
+                <label className="reveal">
+                  <Switch
+                    checked={reveal}
+                    onCheckedChange={(v) => {
+                      setReveal(v);
+                      setReport("");
+                    }}
+                    aria-label="Share public ticker"
+                  />
+                  <span>Include public ticker in research context</span>
+                </label>
+                <p className="privacyexplain">
+                  Only an explicit AI research request sends these fields to the
+                  server. The server adds the selected historical case, a fixed
+                  instruction and a fresh Bitget snapshot when the ticker is
+                  disclosed. When the ticker is hidden, no market snapshot is
+                  fetched or sent to AI. The public question is always shared:
+                  do not put private details in it. Your private notes are held
+                  in memory and disappear on refresh. Provider retention
+                  policies still apply; disclosure controls are not a guarantee
+                  of anonymity.
+                </p>
+              </TabsContent>
+            </Tabs>
+            <div className="publicquestion">
+              <label htmlFor="question">
+                Public research question · sent to AI
+              </label>
+              <textarea
+                id="question"
+                maxLength={1000}
+                value={question}
+                onChange={(e) => {
+                  setQuestion(e.target.value);
+                  setReport("");
+                }}
+              />
+              <p className="fieldnote">
+                Keep private details in the private thesis field. Shared AI demo
+                allowance: 25 calls per UTC day, 200 total. Inspect Disclosure
+                before sending.
+              </p>
+            </div>
+            <div className="researchbar">
+              <div>
+                <span className="aiicon">✳</span>
+                <div>
+                  <strong>Explore the counter-thesis</strong>
+                  <p>
+                    {ready
+                      ? "Ask AI to interpret the sourced case and challenge the disclosed thesis."
+                      : "Local scenario engine ready. Cloud AI is not connected yet."}
+                  </p>
+                </div>
+              </div>
+              <button
+                className="primary"
+                disabled={busy || !ready || !asset || !question.trim()}
+                onClick={research}
+              >
+                {busy ? "Researching…" : "Request AI research"}
+                <ArrowUpRight size={16} />
+              </button>
+            </div>
+            {status && (
+              <p className="status" role="status">
+                {status}
+              </p>
+            )}
+            {report && (
+              <article className="aireport">
+                <h4>AI interpretation · verify against sources</h4>
+                <div>{report}</div>
+              </article>
+            )}
+          </section>
+        </div>
+        <footer>
+          <div className="footer-main">
+            <a className="brand" href="#">
+              <Hexagon /> FaradayDesk
+            </a>
+            <p>
+              Private conviction.
+              <br />
+              Public evidence.
+            </p>
+            <div>
+              <span>RESEARCH LAB</span>
+              <a href="#workspace">Enter the desk ↗</a>
+              <a
+                href="https://github.com/0xileri/FaradayDesk"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Source & methodology ↗
+              </a>
+            </div>
+            <div>
+              <span>BY ILERI BUILDS</span>
+              <p>
+                Human-led research.
+                <br />
+                No autonomous execution.
+              </p>
+            </div>
+          </div>
+          <div
+            className="instrument-marquee"
+            aria-label="RNVDAUSDT, RTSLAUSDT, RAAPLUSDT, Bitget spot, human decides"
+          >
+            <div aria-hidden="true">
+              {[0, 1].map((i) => (
+                <span key={i}>
+                  RNVDAUSDT <b>⬡</b> RTSLAUSDT <b>⬡</b> RAAPLUSDT <b>⬡</b>{" "}
+                  BITGET SPOT <b>⬡</b> HUMAN DECIDES <b>⬡</b>{" "}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <span>FARADAYDESK / RESEARCH SYSTEM 01</span>
+            <span>EVIDENCE BEFORE CONVICTION.</span>
+          </div>
+        </footer>
+      </main>
+    </div>
+  );
 }
-
-

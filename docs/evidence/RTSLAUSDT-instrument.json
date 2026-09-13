@@ -1,0 +1,31 @@
+{
+  "code": "00000",
+  "msg": "success",
+  "requestTime": 1789267443920,
+  "data": [
+    {
+      "symbol": "RTSLAUSDT",
+      "category": "SPOT",
+      "baseCoin": "rTSLA",
+      "quoteCoin": "USDT",
+      "symbolType": "stock",
+      "buyLimitPriceRatio": "0.1",
+      "sellLimitPriceRatio": "0.1",
+      "minOrderQty": "0.0001",
+      "maxOrderQty": "0",
+      "pricePrecision": "2",
+      "quantityPrecision": "4",
+      "quotePrecision": "6",
+      "minOrderAmount": "10",
+      "maxMarketOrderAmount": "1000000",
+      "maxSymbolOrderNum": "",
+      "maxProductOrderNum": "400",
+      "status": "online",
+      "maintainTime": "",
+      "areaSymbol": "yes",
+      "maxPositionNum": "200",
+      "isReality": "yes",
+      "launchTime": "1780323652017"
+    }
+  ]
+}

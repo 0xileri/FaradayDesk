@@ -1,0 +1,51 @@
+{
+  "runAt": "2026-09-13T02:49:33.874Z",
+  "results": [
+    {
+      "asset": "NVDA",
+      "status": 200,
+      "elapsedMs": 12539,
+      "payload": {
+        "asset": "NVDA",
+        "scenario": "weekend",
+        "question": "Challenge this hypothetical long thesis. State missing evidence and invalidation conditions."
+      },
+      "body": {
+        "text": "FaradayDesk Research Report: NVDA Long Thesis Challenge\n\nThesis Challenge\nA long position on RNVDAUSDT assumes price appreciation tracks NVIDIA fundamentals. However, RNVDAUSDT is a tokenized representation, not a direct equity holding. The relationship between token price and underlying stock fair value depends on issuer mechanics, redemption pathways, and USDT peg stability, none of which are verified here.\n\nEvidence Check 1: Venue Snapshot Observation\nSource: https://www.bitget.com/docs/catalog/market/market-data\nThe snapshot at 2026-09-13T02:49:11Z shows last 219.24 USDT, bid 219.25, ask 219.27, spread roughly 0.009 percent. Ask-side depth is roughly 592,000 USDT versus bid-side roughly 21,700 USDT. This asymmetry is a venue observation only, not a signal or forecast. Thin bid depth is a hypothesis-generating observation, not a confirmed liquidity risk.\n\nEvidence Check 2: Off-Hours Information Risk\nHistorical fact supplied: The Federal Reserve issued an emergency statement on a Sunday during COVID-19 (federalreserve.gov/newsevents/pressreleases/monetary20200315a.htm). By analogy, company-specific or macro news arriving outside US equity hours could move RNVDAUSDT while the underlying is untraded. This is an analogy, not an NVDA-specific outcome.\n\nEvidence Check 3: Missing Evidence\nIssuer identity and redemption terms for RNVDAUSDT are not supplied. No earnings or guidance data is provided. No liquidity stress test or peg audit is available.\n\nInvalidation Conditions\nThesis weakens if: issuer redemption is suspended, USDT loses parity, bid depth deteriorates further, or underlying NVDA faces company-specific adverse events.\n\nLimitations\nThis is not a buy or sell recommendation. No probabilities or returns are stated.\n\nSource record (attached by FaradayDesk)\nHistorical case: https://www.federalreserve.gov/newsevents/pressreleases/monetary20200315a.htm\nMarket snapshot: https://www.bitget.com/docs/catalog/market/market-data\nSnapshot timestamp: 2026-09-13T02:49:16.476Z",
+        "marketContext": {
+          "asset": "NVDA",
+          "symbol": "RNVDAUSDT",
+          "category": "SPOT",
+          "quote": "USDT",
+          "retrievedAt": "2026-09-13T02:49:11.778Z",
+          "timestamp": 1789267756476,
+          "last": 219.24,
+          "bid": 219.25,
+          "ask": 219.27,
+          "spreadPercent": 0.009121590805441136,
+          "bidDepthUSDT": 21696.924975,
+          "askDepthUSDT": 592222.982393,
+          "levels": 20,
+          "source": "https://www.bitget.com/docs/catalog/market/market-data",
+          "limitations": "Public venue snapshot, not an executable quote or underlying-stock fair value. Displayed depth covers at most 20 levels per side. No issuer, redemption, USDT peg, slippage or probability assessment."
+        }
+      }
+    },
+    {
+      "asset": "UNDISCLOSED",
+      "status": 200,
+      "elapsedMs": 10920,
+      "payload": {
+        "asset": "UNDISCLOSED",
+        "scenario": "weekend",
+        "question": "Challenge this hypothetical long thesis. State missing evidence and invalidation conditions."
+      },
+      "body": {
+        "text": "FaradayDesk Research Report\n\nThesis Challenge: Undisclosed Asset, Hypothetical Long\n\nCore Challenge\nThe thesis cannot be rigorously evaluated because the asset, entry price, position sizing, and time horizon are all undisclosed. Without these, any challenge is necessarily generic rather than asset-specific.\n\nEvidence Check 1: Policy and Off-Hours Risk\nThe Federal Reserve emergency statement of March 15, 2020 (federalreserve.gov/newsevents/pressreleases/monetary20200315a.htm) is a confirmed historical fact showing that material policy shifts can arrive outside regular trading hours. As a hypothesis, if this asset trades on venues with limited after-hours liquidity, gap risk at open could be severe and difficult to hedge. This is an analogy, not a finding about this specific asset.\n\nEvidence Check 2: Missing Structural Evidence\nNo market snapshot was supplied. Venue liquidity depth, bid-ask spreads, and observable price are all unknown. The long thesis cannot be stress-tested without these inputs.\n\nEvidence Check 3: Catalyst Clarity\nNo catalyst for the long thesis is stated. Whether the thesis rests on earnings, macro rotation, or technical levels is entirely missing. Without a stated catalyst, invalidation conditions are speculative.\n\nInvalidation Conditions (Hypotheses Only)\nIf the unnamed asset is a tokenized equity, USDT de-peg risk is a structural concern distinct from equity fundamentals. If the thesis depends on a specific policy environment, a surprise reversal could invalidate it rapidly and outside trading hours, as the 2020 analogy illustrates.\n\nLimitations\nAsset identity, price, liquidity, and catalyst are all absent. No recommendation is made. No probabilities are inferred.\n\nSource record (attached by FaradayDesk)\nHistorical case: https://www.federalreserve.gov/newsevents/pressreleases/monetary20200315a.htm",
+        "marketContext": {
+          "status": "Omitted because ticker disclosure is disabled."
+        }
+      }
+    }
+  ]
+}

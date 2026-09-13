@@ -1,0 +1,31 @@
+{
+  "code": "00000",
+  "msg": "success",
+  "requestTime": 1789267443114,
+  "data": [
+    {
+      "symbol": "RNVDAUSDT",
+      "category": "SPOT",
+      "baseCoin": "rNVDA",
+      "quoteCoin": "USDT",
+      "symbolType": "stock",
+      "buyLimitPriceRatio": "0.1",
+      "sellLimitPriceRatio": "0.1",
+      "minOrderQty": "0.0001",
+      "maxOrderQty": "0",
+      "pricePrecision": "2",
+      "quantityPrecision": "4",
+      "quotePrecision": "6",
+      "minOrderAmount": "10",
+      "maxMarketOrderAmount": "2100000",
+      "maxSymbolOrderNum": "",
+      "maxProductOrderNum": "400",
+      "status": "online",
+      "maintainTime": "",
+      "areaSymbol": "yes",
+      "maxPositionNum": "200",
+      "isReality": "yes",
+      "launchTime": "1776914552903"
+    }
+  ]
+}

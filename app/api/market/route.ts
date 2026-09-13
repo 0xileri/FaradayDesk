@@ -1,0 +1,3 @@
+import { getMarket } from '@/lib/bitget-market';
+import { instruments, type Asset } from '@/lib/market';
+export async function GET(request:Request){const asset=new URL(request.url).searchParams.get('asset')||'';if(!Object.hasOwn(instruments,asset))return Response.json({error:'Choose a supported ticker.'},{status:400});try{return Response.json(await getMarket(asset as Asset),{headers:{'Cache-Control':'no-store'}});}catch{return Response.json({error:'A fresh, verified Bitget snapshot is unavailable. Try refreshing later.'},{status:503,headers:{'Cache-Control':'no-store'}});}}

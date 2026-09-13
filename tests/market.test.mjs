@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {test} from 'node:test';
+import {normalizeMarket} from '../lib/market.ts';
+const now=1789267369000;
+const ticker={lastPrice:'100',ts:String(now)};
+const book={a:[['101','2']],b:[['99','3']],ts:String(now)};
+test('spread and displayed quote-depth use actual price and quantity',()=>{const s=normalizeMarket('NVDA',ticker,book,now);assert.equal(s.spreadPercent,2);assert.equal(s.bidDepthUSDT,297);assert.equal(s.askDepthUSDT,202);assert.equal(s.symbol,'RNVDAUSDT');});
+test('stale snapshots and future timestamps fail closed',()=>{assert.throws(()=>normalizeMarket('NVDA',{...ticker,ts:String(now-121000)},book,now));assert.throws(()=>normalizeMarket('NVDA',{...ticker,ts:String(now+61000)},book,now));});
+test('crossed, empty and stale order books fail closed',()=>{for(const b of [{...book,a:[]},{...book,a:[['98','2']]},{...book,ts:String(now-121000)}])assert.throws(()=>normalizeMarket('NVDA',ticker,b,now));});
+test('invalid prices cannot appear as a zero quote',()=>{for(const lastPrice of ['',null,0,'NaN','Infinity'])assert.throws(()=>normalizeMarket('NVDA',{...ticker,lastPrice},book,now));});

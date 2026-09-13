@@ -1,40 +1,46 @@
 # FaradayDesk
 
-A decision stress-testing workspace for hypothetical long tokenized-stock positions. Built for Bitget Base Camp S2, AI Trading Desk / Decision Stress Testing.
+Evidence before conviction. A human-led decision stress-testing workspace for Bitget stock-token spot positions, by Ileri Builds.
+
+[Demo](https://faradaydesk-ileri.zesty-lark-4600.chatgpt.site) · [Walkthrough](docs/WALKTHROUGH.md) · [Validation](docs/VALIDATION.md) · [Submission](docs/SUBMISSION.md)
 
 ## Working features
-- Editable ticker, local private notes and notional.
-- Deterministic adverse-move and cost calculations with a user-defined loss budget.
-- Three curated primary-source historical lenses, with explicit limits on comparability.
-- Browser-local disclosure gate. With the cage on, the entire notes field and exact notional are absent from research requests. Public ticker sharing is independent.
-- Review checklist, source links, and JSON worksheet export. Private notes and AI commentary are excluded from exports.
-- Optional server-side research adapter. It is disabled until a provider URL, model and secret are configured. The interface does not simulate an AI response.
-- Read-only WebMCP calculator where supported.
+- Verified mappings: NVDA → RNVDAUSDT; TSLA → RTSLAUSDT; AAPL → RAAPLUSDT. Online SPOT stock-token metadata is checked on every fetch. Quote currency: USDT.
+- Explicit public Bitget refresh: last/bid/ask, spread and 20-level displayed quote-depth with timestamps. Stale, missing or crossed data fails closed.
+- Local long unleveraged stress calculation, chosen shock/costs, loss budget and worksheet export.
+- Three curated primary-source historical lenses: Sunday Fed announcement, NVIDIA earnings and CPI. No historical-neighbor retrieval or return distribution is claimed.
+- Public natural-language question → Claude Sonnet 4.6 counter-thesis, evidence checks and invalidation conditions. The server attaches source links.
+- Faraday cage omits private notes and notional from outgoing requests by default. Ticker disclosure is independent. Inspect the fields before sending.
+- Read-only WebMCP calculator. No account connection, order placement or autonomous execution.
 
-## Run
-Node 22.13+; npm ci; npm run dev. Production: npm run build.
-On this Windows ARM machine, the Cloudflare preview requires an x64 Node binary. A project-local ignored runtime is in `.sites-runtime/node.exe`. Prepend that directory to PATH and run the scripts with that binary. No global Node replacement is required.
+## Complete a task
+Choose NVDA and Weekend macro shock. Set 5,000 USDT, 8% adverse move, 0.5% assumed costs and 500 USDT budget. The local result is 425 USDT hypothetical loss and a calculated notional cap of 5,882.35 USDT. Refresh market context, inspect Disclosure, ask what would invalidate the thesis, verify sources, and export. Humans decide.
 
-## Optional AI setup
-Configure RESEARCH_API_URL (complete HTTPS chat-completions endpoint), RESEARCH_MODEL, and RESEARCH_API_KEY as server-side secrets/settings. See `.env.example`. Never put a provider secret in browser code. A hosted Qwen provider has its own retention terms; open model availability is not a privacy guarantee.
-The endpoint sends only approved request fields plus a fixed source-grounded system prompt and the selected public historical case. It does not connect to the user's Bitget trading account. No order placement is implemented.
+## Run locally
+Node 22.13+, `npm ci`, `npm run dev`. Copy `.env.example` to `.env`; configure server-only RESEARCH_API_URL, RESEARCH_MODEL and RESEARCH_API_KEY. This deployment uses https://api.anthropic.com/v1/chat/completions and claude-sonnet-4-6. Never commit keys.
 
-## Calculation
-Scenario loss = notional × (adverse move % + round-trip costs %) / 100.
-Notional at budget = budget / combined loss rate. A zero combined rate yields no finite calculated cap.
-These are illustrative user assumptions, not return forecasts, VaR, a stress probability, or a validated trading strategy. No current quotes, issuer-specific token data, order-book depth or estimated hedge effectiveness is provided. Long unleveraged spot only; leveraged futures and liquidation require a separate model.
+D1 stores one aggregate usage counter. Run `npm run build`, then apply the local migration:
 
-## Privacy boundary
-Notes exist only in React memory, with no persistence or analytics. The cage-on path excludes notes rather than claiming semantic anonymization. Only the research button sends a POST. Status checks contain no user input. The server attaches the displayed public historical case and a fixed system instruction. Provider processing and retention still apply. Turning the cage off intentionally includes the notes and notional. Disclosure cannot guarantee that remaining context is anonymous.
+```sh
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_careful_skrulls.sql
+```
+
+Restart the development server after migration. On Windows ARM, use x64 Node for Cloudflare's local runtime. The author's ignored `.sites-runtime/node.exe` is not included in the repository.
+
+## Privacy and limitations
+Notes exist only in browser memory and disappear on refresh. Cage on excludes the entire field, not semantic anonymization. The public question is always shared: never put secrets in it. Cage off intentionally shares notes and notional with the server and provider. Hiding the ticker omits market context from AI; an independently requested refresh still sends the selected ticker to Bitget. Provider retention policies apply. Disclosure control is not a guarantee of anonymity.
+
+AI demo allowance: 25 attempts per UTC day and 200 total, enforced atomically in D1. Failed provider attempts count. One visitor could consume the shared allowance; this is a cost ceiling, not per-user fairness. The counter stores no IPs, notes or questions. Local math and market refresh remain available when AI is exhausted.
+
+Loss = notional × (adverse move + assumed costs) / 100. No probabilities, VaR, backtest, issuer/redemption verification, hedge validation or USDT peg guarantee. Displayed depth is not executable liquidity. Futures/liquidation need another model. Worksheet exports omit private notes and AI commentary.
 
 ## Verification
-`node --test tests/stress.test.mjs` checks arithmetic, zero boundaries, complete note exclusion, ticker disclosure and cage-off behavior. `npx tsc --noEmit` checks types. UI checks covered notional recalculation, disclosure toggling, scenario switching, source view, responsive layouts and WebMCP valid/invalid input.
-Live provider quality is unmeasured until a provider is configured. No user preference, retention, trading performance or adoption metrics are claimed.
+```sh
+node --test tests/stress.test.mjs tests/market.test.mjs tests/budget.test.mjs
+npx tsc --noEmit
+npm run build
+```
+Eleven automated checks cover arithmetic, disclosure, market validation and usage caps. Ten synthetic Claude research tasks completed in 9.543–12.469 seconds, median 11.291s. Initial exact historical-URL compliance was 5/10; deterministic source attachment was added and checked separately. These are engineering observations, not human adoption or trading results. See the validation report.
 
-## Hackathon next steps
-1. Configure and evaluate the chosen AI provider.
-2. Expand the case library and test ten complete research tasks with documented rubrics.
-3. Collect real tester feedback and label all metrics observed/targeted.
-4. Record the walkthrough and prepare a compliant X post and submission description.
-5. Make the demo accessible to judges and publish a public source repository with the owner's approval.
-
+## Architecture
+React 19, TypeScript, vinext/Vite, Cloudflare Worker API routes, D1 counter, public Bitget UTA v3 market API, server-side Claude. Bitget Agent MCP was used to discover and verify instruments during development. The deployed app calls the public API directly; it does not host the MCP or Bitget Signal skills.

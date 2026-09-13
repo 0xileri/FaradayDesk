@@ -1,5 +1,9 @@
 # Railway deployment
 
+Live deployment: https://faradaydesk-production.up.railway.app
+
+Verified September 13, 2026: production health check, Claude research request, and worksheet export passed. A Bitget snapshot was retrieved during the research request; future availability still depends on Bitget. Service `faradaydesk` uses a persistent `/data` volume and `PORT=3000`, matching the public domain target port. Credentials are runtime environment variables and are never committed.
+
 This target reuses the same React page and research/market handlers. It serves the Vite-built frontend and `/api/research`, `/api/market` on Node 24. `/healthz` is Railway's health check. No Cloudflare runtime is required on Railway.
 
 ## Deploy
@@ -7,7 +11,7 @@ This target reuses the same React page and research/market handlers. It serves t
 2. Railway detects the root Dockerfile. Keep one replica.
 3. Attach a persistent volume at `/data` before deploying. Railway supplies `RAILWAY_VOLUME_MOUNT_PATH`. Production deliberately refuses to start without the volume so the AI cap cannot reset on every redeploy.
 4. Add runtime variables (not build arguments): `RESEARCH_API_URL`, `RESEARCH_MODEL`, `RESEARCH_API_KEY`. Use the existing Claude provider settings; never commit a secret. Set `PUBLIC_ORIGIN` to the generated HTTPS app URL if Railway does not supply `RAILWAY_PUBLIC_DOMAIN`.
-5. Generate a public Railway domain, deploy, and verify `/healthz`, the research configuration, a synthetic research request and worksheet export.
+5. Set `PORT=3000` and generate a public Railway domain targeting port 3000, deploy, and verify `/healthz`, the research configuration, a synthetic research request and worksheet export.
 
 The Docker runtime contains only the compiled app. `.env`, `.git`, local databases and runtime state are excluded from its build context. Keys are read only by server code at runtime. SQLite stores the same aggregate 25/day, 200-total quota with atomic SQL. A new Railway service has its own counter; this does not combine usage with the old Sites deployment. Keep a single replica with one persistent volume.
 

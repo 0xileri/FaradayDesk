@@ -1,5 +1,7 @@
 # Bitget Qwen setup
 
+Activated September 13, 2026. The gateway was verified with `qwen3.8-max`. FaradayDesk sets Responses `reasoning.effort=none`: the default consumed the 1,200-token output allowance entirely in reasoning and returned an incomplete response. Codex keeps its separate coding reasoning setting. Restart Codex to load the new provider and user environment variable.
+
 Provider supplied by the hackathon: `https://hackathon.bitgetops.com/v1`, model `qwen3.8-max`, Responses protocol. Gateway compatibility and key eligibility must be verified with an authenticated request before switching production.
 
 On Windows, run `powershell -NoProfile -File .\scripts\set-qwen-key.ps1` from the project folder. It prompts for the key without echoing it, saves a Windows user environment variable for Codex, and an ignored `.env.qwen` for setup. Never paste the key in chat or commit it. The environment variable and file are local credential storage, not an encrypted vault.

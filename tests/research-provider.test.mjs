@@ -11,6 +11,7 @@ test("Responses adapter preserves messages, bounds output and disables storage",
     input: messages,
     max_output_tokens: 1200,
     store: false,
+    reasoning: { effort: 'none' },
   });
   assert.equal(providerPayload("claude", messages, "chat").messages, messages);
 });

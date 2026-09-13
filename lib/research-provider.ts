@@ -5,7 +5,8 @@ export function providerPayload(
   wire: string,
 ) {
   if (wire === "responses")
-    return { model, input: messages, max_output_tokens: 1200, store: false };
+    return { model, input: messages, max_output_tokens: 1200, store: false,
+      ...(model === 'qwen3.8-max' ? { reasoning: { effort: 'none' } } : {}) };
   if (wire !== "chat") throw Error("Unsupported research API protocol.");
   return { model, messages, max_tokens: 1200 };
 }

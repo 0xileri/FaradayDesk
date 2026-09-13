@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { DeskHero } from "@/components/desk-hero";
+import { ResearchReport } from "@/components/research-report";
 import {
   Shield,
   Hexagon,
@@ -621,10 +622,10 @@ export default function Home() {
                         {market.ask}
                       </p>
                       <p>
-                        Displayed depth: bids {market.bidDepthUSDT.toFixed(0)} USDT
-                        {" "}({market.bidLevels ?? market.levels} levels) · asks{" "}
-                        {market.askDepthUSDT.toFixed(0)} USDT
-                        {" "}({market.askLevels ?? market.levels} levels)
+                        Displayed depth: bids {market.bidDepthUSDT.toFixed(0)}{" "}
+                        USDT ({market.bidLevels ?? market.levels} levels) · asks{" "}
+                        {market.askDepthUSDT.toFixed(0)} USDT (
+                        {market.askLevels ?? market.levels} levels)
                       </p>
                       <p className="fieldnote">
                         Source timestamp:{" "}
@@ -968,12 +969,7 @@ export default function Home() {
                 {status}
               </p>
             )}
-            {report && (
-              <article className="aireport">
-                <h4>AI interpretation · verify against sources</h4>
-                <div>{report}</div>
-              </article>
-            )}
+            {report && <ResearchReport text={report} />}
           </section>
         </div>
         <footer>

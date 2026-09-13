@@ -1901,3 +1901,122 @@ footer {
     transform: none;
   }
 }
+
+/* Research memo: text remains inspectable, with sections for quick review. */
+.aireport.research-report {
+  padding: 28px;
+}
+.report-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+.report-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: #ff9a36;
+}
+.report-heading h3 {
+  font-size: clamp(24px, 3vw, 38px);
+  line-height: 1.1;
+  margin: 12px 0;
+  letter-spacing: -0.04em;
+}
+.report-badge {
+  border: 1px solid #7d4b20;
+  color: #ffad5b;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  padding: 8px;
+  white-space: nowrap;
+}
+.report-intro {
+  color: #b8bcc1;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 4px 0 24px;
+}
+.aireport > .report-sections {
+  white-space: normal;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.report-section {
+  min-width: 0;
+  border: 1px solid #303338;
+  padding: 20px;
+  background: #151719;
+}
+.report-section[data-kind="Research context"],
+.report-section[data-kind="Source record"] {
+  grid-column: 1/-1;
+  background: #111315;
+}
+.report-section[data-kind="Invalidation conditions"] {
+  border-left: 3px solid #ff7f00;
+}
+.report-section-heading {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+.report-section-heading > span {
+  color: #ff7f00;
+  font-family: monospace;
+  font-size: 11px;
+}
+.report-section-heading h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #eef0f2;
+}
+.report-body {
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #c9cdd1;
+}
+.report-body p {
+  margin: 12px 0 0;
+  white-space: pre-wrap;
+}
+.report-original {
+  margin-top: 20px;
+  border-top: 1px solid #303338;
+  padding-top: 16px;
+}
+.report-original summary {
+  cursor: pointer;
+  color: #c9cdd1;
+  font-size: 12px;
+}
+.report-original summary:focus-visible {
+  outline: 2px solid #ff7f00;
+  outline-offset: 5px;
+}
+.report-original pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-top: 16px;
+}
+@media (max-width: 900px) {
+  .aireport > .report-sections {
+    grid-template-columns: 1fr;
+  }
+  .report-heading {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+@media (max-width: 650px) {
+  .aireport.research-report {
+    padding: 18px;
+  }
+  .report-section {
+    padding: 16px;
+  }
+}

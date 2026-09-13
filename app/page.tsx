@@ -21,7 +21,12 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cases, makePayload, calculate } from "@/lib/stress";
-import { instruments, type MarketSnapshot, type Asset } from "@/lib/market";
+import {
+  instruments,
+  isMarketFresh,
+  type MarketSnapshot,
+  type Asset,
+} from "@/lib/market";
 import validationSnapshot from "@/lib/validation-snapshot.json";
 
 export default function Home() {
@@ -57,6 +62,8 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
   const scenario = cases[active];
+  const marketFresh =
+    market !== null && !recorded && isMarketFresh(market.timestamp, clockNow);
   const result = calculate(size, shock, cost, budget);
   const payload = {
     ...makePayload(asset, scenario.id, cage, reveal, notes, size),
@@ -129,11 +136,16 @@ export default function Home() {
     setRecorded(false);
     setMarketBusy(true);
     setMarket(null);
+    setMarketStatus("Fetching and validating the Bitget snapshot…");
     try {
-      const r = await fetch("/api/market?asset=" + encodeURIComponent(asset));
+      const r = await fetch("/api/market?asset=" + encodeURIComponent(asset), {
+        signal: AbortSignal.timeout(15000),
+        cache: "no-store",
+      });
       const d = (await r.json()) as MarketSnapshot & { error?: string };
       if (!r.ok) throw Error(d.error);
       setMarket(d);
+      setClockNow(Date.now());
       setMarketStatus(
         "Snapshot fetched. Refresh before use; prices and depth can change.",
       );
@@ -541,7 +553,11 @@ export default function Home() {
                   </div>
                   <div>
                     <span>
-                      {recorded ? "Recorded spread" : "Snapshot spread"}
+                      {recorded
+                        ? "Recorded spread"
+                        : market && !marketFresh
+                          ? "Stale snapshot spread"
+                          : "Snapshot spread"}
                     </span>
                     <strong className="unknown">
                       {market?.spreadPercent != null
@@ -550,7 +566,9 @@ export default function Home() {
                     </strong>
                     <small>
                       {market
-                        ? "Timestamped venue observation"
+                        ? marketFresh
+                          ? "Fresh venue snapshot · not streaming"
+                          : "Historical observation · refresh required"
                         : "Refresh market context below"}
                     </small>
                   </div>
@@ -572,6 +590,7 @@ export default function Home() {
                   {!market && asset === "NVDA" && (
                     <button
                       className="secondary"
+                      disabled={marketBusy}
                       onClick={() => {
                         setMarket(validationSnapshot as MarketSnapshot);
                         setRecorded(true);
@@ -585,7 +604,7 @@ export default function Home() {
                   )}
                   {market && (
                     <>
-                      {clockNow - market.timestamp > 120000 && (
+                      {!marketFresh && !recorded && (
                         <p role="status" className="orange">
                           This snapshot is stale. Refresh before using it.
                         </p>
@@ -602,9 +621,10 @@ export default function Home() {
                         {market.ask}
                       </p>
                       <p>
-                        Displayed depth ({market.levels} levels): bids{" "}
-                        {market.bidDepthUSDT.toFixed(0)} USDT · asks{" "}
+                        Displayed depth: bids {market.bidDepthUSDT.toFixed(0)} USDT
+                        {" "}({market.bidLevels ?? market.levels} levels) · asks{" "}
                         {market.askDepthUSDT.toFixed(0)} USDT
+                        {" "}({market.askLevels ?? market.levels} levels)
                       </p>
                       <p className="fieldnote">
                         Source timestamp:{" "}

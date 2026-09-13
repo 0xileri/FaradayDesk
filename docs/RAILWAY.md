@@ -1,6 +1,6 @@
 # Railway deployment
 
-Live deployment: https://faradaydesk-production.up.railway.app
+Live deployment: https://faradaydesk.up.railway.app
 
 Verified September 13, 2026: production health check, Claude research request, and worksheet export passed. A Bitget snapshot was retrieved during the research request; future availability still depends on Bitget. Service `faradaydesk` uses a persistent `/data` volume and `PORT=3000`, matching the public domain target port. Credentials are runtime environment variables and are never committed.
 

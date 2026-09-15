@@ -1,0 +1,114 @@
+/* Editorial shell / charcoal research desk. Scoped overrides keep the working
+   controls and data states consistent with the original application. */
+body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; }
+body .topbar { height: 82px; background: #f3f1e9; color: #20221f; border-color: #d6d6cd; padding-inline: 5%; }
+.topbar .brand { font-size: 23px; letter-spacing: -1.2px; }
+.topbar .brandthin { color: #20221f; }
+.topbar .brand small { color: #65675f; letter-spacing: 1.4px; }
+.topbar .navlinks { font-size: 13px; gap: 34px; }
+.topbar .navlinks a { color: #464941; }
+.topbar .navlinks a:hover { color: #a64700; }
+.topbar .mode { border-color: #cccec4; font-size: 10px; border-radius: 30px; background: #e9e9df; padding: 9px 14px; }
+body main { max-width: none; }
+main .hero { background: #f3f1e9; color: #20221f; min-height: 720px; grid-template-columns: 1.06fr 1fr; gap: 5%; padding: 58px 5% 64px; border-color: #d6d6cd; }
+.hero .hero-copy { position: relative; top: auto; padding-top: 19px; }
+.hero .eyebrow { color: #62665b; font-size: 9px; letter-spacing: 1.5px; }
+.hero h1 { font-size: clamp(88px, 10.8vw, 172px); font-weight: 650; letter-spacing: -.082em; line-height: .86; margin: 42px 0 30px; }
+.hero h1 > span { color: #20221f; }
+.hero .hero-description { color: #5c6057; font-size: clamp(16px, 1.45vw, 21px); line-height: 1.65; letter-spacing: -.45px; }
+.hero .wordline { color: #41463b; font-size: 14px; margin-block: 24px 0; }
+.hero .word-window { color: #a74700; }
+.hero .hero-actions { gap: 24px; margin-top: 29px; }
+.hero .primary { background: #20221f; border-color: #20221f; color: #f3f1e9; padding: 17px 21px; font-size: 12px; border-radius: 5px; }
+.hero .primary:hover { background: #ff7f00; color: #20221f; border-color: #ff7f00; }
+.hero .plain-link { color: #474b40; font-size: 12px; }
+.hero .hero-bottom { color: #676c5e; border-top: 1px solid #d4d6cb; padding-top: 20px; margin-top: 36px; font-size: 8px; letter-spacing: 1px; flex-direction: row; justify-content: space-between; }
+.hero .hero-system { background: #ff7f00; align-self: stretch; padding: 22px; display: flex; flex-direction: column; min-height: 565px; border-radius: 7px; perspective: none; }
+.hero-art-caption { display: flex; justify-content: space-between; color: #402600; font-size: 9px; letter-spacing: 1px; font-weight: 600; }
+.hero .field-sculpture { height: 310px; margin: 0 -12px; flex: 1; min-height: 230px; }
+.hero .field-sculpture svg { filter: none; animation: none; }
+.hero .sculpture-label { right: 10px; bottom: 65px; color: #402600; font-size: 8px; }
+.hero .hero-terminal { transform: none; border: 1px solid #343932; border-radius: 6px; margin-top: -8px; background: #20231f; box-shadow: 0 15px 30px #6c320033; color: #f3f1e9; }
+.hero .terminal-title { padding: 14px 16px; font-size: 9px; border-color: #41463c; }
+.hero .honesty-label { color: #ffd0a1 !important; border-color: #775333; font-size: 8px !important; }
+.hero .terminal-body { padding: 20px 18px; grid-template-columns: 1fr 1fr; }
+.hero .terminal-body .eyebrow { color: #b8c0ae; font-size: 8px; }
+.hero .terminal-body strong { font-size: 43px; margin-top: 14px; letter-spacing: -2px; }
+.hero .terminal-body small { color: #b1b8a9; font-size: 9px; margin-top: 8px; }
+.hero .terminal-meta { border-color: #41463c; padding: 13px 16px; color: #b1b8a9; font-size: 8px; }
+.hero .hero-disclosure { width: 100%; border: 0; border-radius: 0; padding: 18px 0 0; margin: 0; color: #30240f; box-shadow: none; background: transparent; gap: 12px; }
+.hero .hero-disclosure > svg { color: #30240f; }
+.hero .hero-disclosure strong { font-size: 13px; }
+.hero .hero-disclosure small { color: #503715; font-size: 10px; }
+.hero .system-caption { display: none; }
+main .method-strip { background: #e8e9df; border-color: #d1d4c6; padding: 38px 5%; gap: 28px; grid-template-columns: 1.2fr 1fr 1fr 1fr; }
+.method-strip .outline-word { display: none; }
+.method-strip .eyebrow { color: #666d5d; font-size: 9px; }
+.method-strip h2 { color: #252b21; font-size: 26px; font-weight: 550; letter-spacing: -1px; margin-top: 10px; }
+.method-strip .method-item { border-color: #c6ccbd; padding-left: 25px; }
+.method-strip .method-item > span { color: #985000; font-size: 9px; font-weight: 700; }
+.method-strip .method-item p { color: #555f4c; font-size: 12px; margin-top: 10px; }
+main .pageheading { padding: 64px 5% 30px; }
+.pageheading h2 { font-weight: 500; letter-spacing: -1.8px; font-size: clamp(29px, 3.3vw, 49px); }
+main .workspace { padding-inline: 5%; gap: 20px; grid-template-columns: 38px 290px minmax(0, 1fr); }
+.workspace .inputs, .workspace .analysis { border-radius: 8px; background: #191c1a; border-color: #343a34; }
+.workspace .sectionhead, .workspace .analysishead { padding-block: 21px; }
+.workspace .sectionnumber { font-family: "Segoe UI", Arial, sans-serif; font-size: 29px; font-weight: 300; }
+.workspace .casepicker { background: #161916; border-radius: 0 0 8px 8px; }
+.workspace .tickerinput, .workspace .moneyinput, .workspace textarea, .workspace .assumptions input { background: #121612; border-color: #3e473a; border-radius: 4px; }
+.workspace .tickerinput select { background: #121612; }
+.workspace .cagebox { border-radius: 5px; }
+.workspace .cagebox[data-enabled="true"] { background: #2a251c; border-color: #886035; }
+.workspace .metrics { background: #20251f; border-color: #3c4538; border-radius: 5px; }
+.workspace .metrics strong { font-size: clamp(24px, 2.5vw, 36px); letter-spacing: -1.5px; }
+.workspace .metrics strong.unknown { font-size: 23px; }
+.workspace .marketpanel, .workspace .weekend-history { background: #151a15; border-color: #343e30; border-radius: 5px; }
+.workspace .primary, .workspace .secondary, .pageheading .secondary { border-radius: 4px; }
+.workspace .stressintro h3, .workspace .evidenceintro h3 { font-weight: 500; }
+.workspace .flowrail button span { border-radius: 50%; border-color: #444b40; }
+.workspace .desktabs [data-slot="tabs-trigger"] { min-height: 48px; }
+.workspace .researchbar { background: #20241c; border-radius: 0 0 8px 8px; }
+.workspace .report-section { border-radius: 4px; }
+@media (min-width: 1600px) {
+  main .hero, main .method-strip, main .pageheading, main .workspace { padding-inline: max(5%, calc((100% - 1540px) / 2)); }
+  main .hero { min-height: 790px; }
+  .hero .hero-system { min-height: 620px; }
+}
+@media (max-width: 1100px) {
+  main .hero { gap: 4%; min-height: 660px; padding-top: 38px; padding-bottom: 40px; }
+  .hero h1 { font-size: 10.5vw; }
+  .hero .hero-system { padding: 18px; min-height: 530px; }
+  .hero .hero-actions { align-items: flex-start; flex-direction: column; gap: 17px; }
+  .hero .hero-bottom { flex-direction: column; gap: 5px; }
+  .hero .terminal-body strong { font-size: 35px; }
+  main .workspace { padding-inline: 3%; grid-template-columns: 230px minmax(0, 1fr); gap: 16px; }
+  .workspace .flowrail { display: none; }
+  main .method-strip { gap: 22px; }
+}
+@media (max-width: 760px) {
+  body .topbar { height: 72px; padding-inline: 6%; gap: 14px; }
+  .topbar .brand { font-size: 21px; }
+  .topbar .navlinks { display: none; }
+  .topbar .mode { font-size: 8px; padding: 8px 10px; }
+  main .hero { display: grid; grid-template-columns: 1fr; padding: 30px 6% 35px; gap: 30px; }
+  .hero .hero-copy { padding-top: 0; }
+  .hero .eyebrow { font-size: 8px; letter-spacing: 1px; }
+  .hero h1 { font-size: clamp(78px, 17vw, 122px); margin: 32px 0 24px; }
+  .hero .hero-description { font-size: 17px; }
+  .hero .hero-actions { flex-direction: row; align-items: center; gap: 20px; }
+  .hero .hero-bottom { flex-direction: row; margin-top: 28px; font-size: 7px; }
+  .hero .hero-system { min-height: 490px; padding: 20px; }
+  .hero .field-sculpture { height: 240px; }
+  .hero .terminal-body { grid-template-columns: 1fr 1fr; }
+  .hero .terminal-body svg { height: 75px; }
+  main .method-strip { grid-template-columns: 1fr 1fr; padding: 30px 6%; gap: 28px 18px; }
+  .method-strip .method-item { padding-left: 15px; }
+  .method-strip h2 { font-size: 25px; }
+  main .pageheading { padding: 38px 6% 24px; }
+  main .workspace { grid-template-columns: 1fr; padding-inline: 5%; gap: 22px; }
+  .workspace .inputs { display: block; }
+  .workspace .metrics strong.unknown { font-size: 21px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero *, .workspace * { scroll-behavior: auto !important; }
+}

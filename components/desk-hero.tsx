@@ -17,7 +17,7 @@ export function DeskHero({
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero-copy">
         <div className="eyebrow">
-          <span className="signal-dot" /> ILERI BUILDS / RESEARCH SYSTEM 01
+          <span className="signal-dot" /> INDEPENDENT THINKING. STRUCTURED RESEARCH.
         </div>
         <h1 id="hero-title">
           Before
@@ -54,54 +54,21 @@ export function DeskHero({
         </div>
       </div>
       <div className="hero-system">
-        <div className="hero-watermark" aria-hidden="true">
-          FARADAY
-        </div>
+        <div className="hero-art-caption" aria-hidden="true"><span>FD—01</span><span>THE CONVICTION STUDY</span></div>
         <div className="field-sculpture" aria-hidden="true">
           <svg viewBox="0 0 600 420">
-            <defs>
-              <radialGradient id="cage-glow">
-                <stop stopColor="#ff7f00" stopOpacity=".2" />
-                <stop offset="1" stopColor="#ff7f00" stopOpacity="0" />
-              </radialGradient>
-            </defs>
-            <ellipse
-              cx="300"
-              cy="235"
-              rx="275"
-              ry="185"
-              fill="url(#cage-glow)"
-            />
-            <g className="field-lines" fill="none" stroke="#ff7f00">
-              {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                <polygon
-                  key={i}
-                  points="300,42 449,128 449,300 300,386 151,300 151,128"
-                  transform={`translate(300 214) scale(${1 - i * 0.095}) translate(-300 -214)`}
-                  opacity={0.14 + i * 0.09}
-                />
+            <g fill="none" stroke="#171916">
+              <path d="M55 210H545M300 18V400" opacity=".18" strokeDasharray="3 6" />
+              <ellipse cx="300" cy="365" rx="140" ry="16" fill="#171916" opacity=".06" stroke="none" />
+              {Array.from({ length: 15 }, (_, i) => (
+                <polygon key={i} points="0,-139 121,-70 121,70 0,139 -121,70 -121,-70"
+                  transform={`translate(${255 + i * 6.5} ${175 + i * 3}) scale(.95 1)`}
+                  strokeWidth={i === 0 || i === 14 ? 2.6 : 1.1} opacity={i === 0 || i === 14 ? 1 : .65} />
               ))}
-              <path
-                d="M300 42V386M151 128L449 300M449 128L151 300"
-                opacity=".35"
-              />
+              <path d="M255 36L346 78M140 108L231 150M140 242L231 284M255 314L346 356M370 242L461 284M370 108L461 150" strokeWidth="2" />
             </g>
-            <g fill="#ff7f00">
-              {[
-                [300, 42],
-                [449, 128],
-                [449, 300],
-                [300, 386],
-                [151, 300],
-                [151, 128],
-              ].map(([x, y]) => (
-                <circle key={`${x}-${y}`} cx={x} cy={y} r="3" />
-              ))}
-            </g>
-            <path
-              d="M283 188H320V197H293V210H315V220H293V246H283Z"
-              fill="#ff7f00"
-            />
+            <path d="M283 158H330V168H296V187H323V197H296V227H283Z" fill="#171916" />
+            <g fill="#171916" fontFamily="monospace" fontSize="9"><text x="45" y="205">01</text><text x="530" y="205">02</text><text x="310" y="30">FIELD / F</text></g>
           </svg>
           <span className="sculpture-label">
             FIELD / {cage ? "ENGAGED" : "STANDBY"}

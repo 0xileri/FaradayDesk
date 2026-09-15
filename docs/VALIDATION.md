@@ -1,4 +1,13 @@
-# Validation — 13 September 2026
+# Validation
+
+## Current implementation — 15 September 2026
+27 automated tests pass, plus TypeScript and the Railway production build. New checks cover complete UTC weekends, missing/zero-volume candles, incomplete windows, invalid OHLC, duplicate conflicts, interpolation, sample-size gating and strict shock comparison. Hidden-ticker integration checks verify no historical context is requested. See WEEKEND-HISTORY.md for the calculation contract.
+
+Production history checks on September 15 returned NVDA 12 complete/0 excluded weekends, TSLA 11/1, and AAPL 7/5 in the 84-day sample. AAPL statistics were correctly withheld below eight windows. AAPL initially hit HTTP 429; bounded retry and two-at-a-time requests were added. Desktop and mobile panel rendering passed browser inspection. A synthetic Qwen request received the 12-window NVDA history and source record; its prose called the comparison a return comparison, so the code-calculated starting-price-to-low comparison is now explicitly attached outside the model. AI prose remains subject to review.
+
+The active public deployment is https://faradaydesk.up.railway.app and uses Qwen 3.8 Max. Qwen completed a production research request in 11 seconds on September 13 with all five memo sections and an attached source record. That is a smoke test, not the ten-task benchmark below. No human adoption or trading improvement is established.
+
+The following benchmark and original checks are retained as dated September 13 engineering evidence.
 
 ## Observed engineering checks
 Eleven tests pass: loss and zero boundaries; note omission; ticker disclosure; cage-off sharing; sources; spread/depth normalization; stale/future prices; crossed/empty/stale books; invalid quotes; atomic daily/total usage caps.
@@ -34,5 +43,5 @@ Recruit five relevant retail traders for two unaided tasks each. Target ≥9/10 
 
 Activation target: 4/5 complete a first worksheet. Retention target: 3/5 return within seven days. No observed human users, retention, AUM, volume, incremental fees, returns, Sharpe, win rate or risk reduction is claimed.
 
-## Hosted integration limitation
-The deployed Claude route passed an owner-authenticated research check with source attachment. Bitget public market requests from the deployed server returned HTTP 403, confirmed in Worker diagnostics; the same integration succeeded locally. Therefore hosted live market availability is not claimed. The UI offers an explicitly dated NVDA validation snapshot as optional recorded evidence; it is not a live quote. AI omits market context when its live fetch fails. Resolving the hosted Bitget restriction remains outstanding. Public audience approval is pending; the demo is currently owner-private.
+## Legacy Cloudflare observation — superseded by Railway deployment
+The original Cloudflare host returned Bitget HTTP 403 while local requests succeeded. The app subsequently moved to a public Railway deployment where all three snapshots passed checks. The optional recorded NVDA snapshot is still explicitly dated. Availability remains dependent on the venue; the original private-access and hosted-403 blockers no longer describe the current Railway deployment.

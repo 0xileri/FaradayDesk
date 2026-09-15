@@ -1902,6 +1902,84 @@ footer {
   }
 }
 
+.weekend-history {
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid #303338;
+  background: #151719;
+}
+.weekend-history h3 {
+  font-size: 28px;
+  margin: 14px 0;
+  letter-spacing: -0.04em;
+}
+.weekend-history p {
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.history-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 20px 0;
+}
+.history-metrics > div {
+  border: 1px solid #303338;
+  padding: 14px;
+}
+.history-metrics span {
+  display: block;
+  font-size: 11px;
+  color: #b8bcc1;
+}
+.history-metrics strong {
+  display: block;
+  font: 20px monospace;
+  margin-top: 10px;
+}
+.history-comparison {
+  border-left: 3px solid #ff7f00;
+  padding: 12px;
+  background: #191c20;
+}
+.history-table {
+  overflow-x: auto;
+  margin-top: 14px;
+}
+.history-table table {
+  border-collapse: collapse;
+  width: 100%;
+  font: 12px monospace;
+}
+.history-table th,
+.history-table td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #303338;
+}
+.weekend-history summary {
+  cursor: pointer;
+  font-size: 14px;
+}
+.weekend-history summary:focus-visible {
+  outline: 2px solid #ff7f00;
+  outline-offset: 4px;
+}
+.weekend-history a {
+  color: #ffad5b;
+  font-size: 13px;
+}
+@media (max-width: 900px) {
+  .history-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 650px) {
+  .weekend-history {
+    padding: 16px;
+  }
+}
 /* Research memo: text remains inspectable, with sections for quick review. */
 .aireport.research-report {
   padding: 28px;

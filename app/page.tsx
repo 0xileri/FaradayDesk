@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { DeskHero } from "@/components/desk-hero";
 import { ResearchReport } from "@/components/research-report";
+import { WeekendHistory } from "@/components/weekend-history";
 import {
   Shield,
   Hexagon,
@@ -69,6 +70,7 @@ export default function Home() {
   const payload = {
     ...makePayload(asset, scenario.id, cage, reveal, notes, size),
     question,
+    ...(reveal && scenario.id === "weekend" ? { shockPercent: shock } : {}),
   };
   useEffect(() => {
     fetch("/api/research")
@@ -826,6 +828,12 @@ export default function Home() {
                 </div>
               </TabsContent>
               <TabsContent value="evidence">
+                <WeekendHistory
+                  key={asset + scenario.id}
+                  asset={asset}
+                  lens={scenario.id}
+                  shock={shock}
+                />
                 <div className="evidenceintro">
                   <span className="eyebrow orange">
                     CURATED HISTORICAL CONTEXT
@@ -915,12 +923,13 @@ export default function Home() {
                   Only an explicit AI research request sends these fields to the
                   server. The server adds the selected historical case, a fixed
                   instruction and a fresh Bitget snapshot when the ticker is
-                  disclosed. When the ticker is hidden, no market snapshot is
-                  fetched or sent to AI. The public question is always shared:
-                  do not put private details in it. Your private notes are held
-                  in memory and disappear on refresh. Provider retention
-                  policies still apply; disclosure controls are not a guarantee
-                  of anonymity.
+                  disclosed. For the weekend lens, it also adds verified token
+                  history and your disclosed shock percentage. When the ticker
+                  is hidden, no token history or market snapshot is fetched or
+                  sent to AI. The public question is always shared: do not put
+                  private details in it. Your private notes are held in memory
+                  and disappear on refresh. Provider retention policies still
+                  apply; disclosure controls are not a guarantee of anonymity.
                 </p>
               </TabsContent>
             </Tabs>

@@ -95,9 +95,15 @@ test("Railway routes preserve privacy, origin checks and persistent quota across
     }
     assert.equal(captured.length, 25);
     for (const c of captured) {
-      const data = JSON.parse(c.messages[1].content);
+      const data = JSON.parse(
+        c.messages.find((m) => m.role === "user").content,
+      );
       assert.ok(!("privateNotes" in data.research));
       assert.ok(!("positionNotional" in data.research));
+      assert.equal(
+        data.weekendHistory.status,
+        "Not requested: ticker hidden or lens is not weekend.",
+      );
     }
     assert.equal((await post(payload)).status, 429);
     child.kill();
@@ -112,7 +118,10 @@ test("Railway routes preserve privacy, origin checks and persistent quota across
       await once(child, "exit");
     }
     await new Promise((r) => provider.close(r));
-    assert.ok(resolve(dir).startsWith(resolve(tmpdir()) + sep) && basename(dir).startsWith("faraday-test-"));
+    assert.ok(
+      resolve(dir).startsWith(resolve(tmpdir()) + sep) &&
+        basename(dir).startsWith("faraday-test-"),
+    );
     await rm(dir, { recursive: true, force: true });
   }
 });

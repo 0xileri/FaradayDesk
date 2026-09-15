@@ -7,6 +7,7 @@ import { DatabaseSync } from "node:sqlite";
 import { createResearchHandlers } from "../lib/research-handler";
 import { reserveSQL } from "../lib/research-budget";
 import { GET as market } from "../app/api/market/route";
+import { GET as history } from "../app/api/history/route";
 
 if (
   process.env.NODE_ENV === "production" &&
@@ -65,6 +66,8 @@ const server = createServer(async (req, res) => {
         response = await research.GET();
       else if (req.method === "GET" && url.pathname === "/api/market")
         response = await market(new Request(url, { headers }));
+      else if (req.method === "GET" && url.pathname === "/api/history")
+        response = await history(new Request(url, { headers }));
       else if (req.method === "POST" && url.pathname === "/api/research") {
         const chunks: Buffer[] = [];
         let bytes = 0;

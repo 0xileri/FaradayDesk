@@ -1,12 +1,12 @@
 # X post draft — not posted
 
-Building FaradayDesk: challenge stock-token ideas with Bitget snapshots, local stress math and an inspectable privacy gate. Humans decide.
+Building FaradayDesk: challenge a stock-token thesis with Bitget snapshots, observed weekend history and local stress math. Private notes stay in your browser. Humans decide.
 
 What would invalidate your thesis?
-https://faradaydesk-ileri.zesty-lark-4600.chatgpt.site
+https://faradaydesk.up.railway.app
 
 #BitgetHackathon @Bitget_AI
 
-Publishing instructions (not part of the post): the official handbook requires the hashtag, mention and a product introduction. It also asks participants to retweet the official post, but its link remains marked TBD as of September 13. Locate the official S2 announcement on @Bitget_AI and quote-post this introduction, or confirm the required retweet link with the organizers. No post or retweet has been made. Use the resulting real X URL in the submission form.
+Publishing instructions (not part of the post): the link points at the live Railway demo, which now serves a preview card from `/og-image.png`, so the post renders with an image. The hashtag and mention were hackathon requirements; keep them only while the post is framed as a hackathon entry, since the S2 submission deadline passed on 21 September 2026. No post or retweet has been made by the agent. If a post goes out, record its real URL in `docs/SUBMISSION.md`.
 
 Handbook verified: https://bitget-ai.gitbook.io/bitgetai_hackathons2/

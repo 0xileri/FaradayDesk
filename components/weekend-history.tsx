@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { WeekendHistory as History } from "@/lib/bitget-history";
-import { compareShock } from "@/lib/weekend-history";
+import { compareShock, MINIMUM_WINDOWS } from "@/lib/weekend-history";
 export function WeekendHistory({
   asset,
   lens,
@@ -77,8 +77,15 @@ export function WeekendHistory({
               <p>{data.windowDefinition}</p>
               {!data.sufficient && (
                 <p className="orange">
-                  Fewer than 8 complete weekends. Percentiles and shock ranking
-                  are withheld.
+                  Fewer than {MINIMUM_WINDOWS} complete weekends. Percentiles
+                  and shock ranking are withheld.
+                </p>
+              )}
+              {data.sufficient && data.sampleSize <= MINIMUM_WINDOWS + 1 && (
+                <p className="orange">
+                  Only {data.sampleSize} complete weekends: one more exclusion
+                  would fall below the {MINIMUM_WINDOWS}-window minimum and
+                  withhold these statistics.
                 </p>
               )}
               {data.stats && (

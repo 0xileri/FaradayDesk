@@ -1,0 +1,33 @@
+# FaradayDesk
+
+> A human-led decision stress-testing desk for Bitget stock-token spot positions. Private notes stay in the browser; public evidence, deterministic arithmetic and AI interpretation are kept separate and each is sourced.
+
+FaradayDesk calculates hypothetical loss for an unleveraged long spot position, retrieves observed weekend trading history for Bitget stock tokens, and asks a language model to challenge a stated thesis using only supplied, sourced context. It places no orders, connects to no account and holds no funds.
+
+## How to read the figures
+
+- Weekend window: Saturday 00:00 UTC to Monday 00:00 UTC, measured from twelve consecutive four-hour stock-token candles. This is not the US cash-market Friday-close to Monday-open gap.
+- End return compares the Saturday opening price with the final Sunday candle close. Decline to low compares the Saturday opening price with the lowest candle low inside the window.
+- A weekend with any missing or zero-volume candle is excluded whole, and the count of exclusions is always reported.
+- Percentiles and shock comparisons are withheld below eight complete windows. Samples are small either way.
+- Figures are observations of one venue's token trading. They are not underlying equity returns, matched macro events, probabilities, forecasts or recommendations.
+- Loss = notional x (adverse move + assumed costs) / 100. The adverse move is chosen by the user, not predicted.
+
+## Public endpoints
+
+Read-only, no key required, rate limited per address. Please cache responses; the weekend history is recalculated at most hourly per instrument.
+
+- GET /api/market?asset=NVDA|TSLA|AAPL — validated spot snapshot: last, bid, ask, spread, twenty-level displayed depth, source timestamps. Stale, crossed or malformed books fail closed with HTTP 503 rather than returning a partial quote.
+- GET /api/history?lens=weekend&asset=NVDA|TSLA|AAPL — observed weekend windows over the preceding 84 days: dated windows, sample size, exclusions, and percentiles when at least eight windows are complete.
+- GET /api/research — whether cloud AI is configured. The research POST itself is interactive, shares a capped allowance and is not for automated use.
+- GET /healthz — service health.
+
+## Instruments
+
+NVDA maps to RNVDAUSDT, TSLA to RTSLAUSDT, AAPL to RAAPLUSDT, all Bitget SPOT stock tokens quoted in USDT. Listing metadata is re-verified on every fetch; it does not establish issuer reserves, redemption rights or USDT parity.
+
+## Sources
+
+- Market and candle data: https://www.bitget.com/docs/catalog/market/market-data
+- Source and methodology: https://github.com/0xileri/FaradayDesk
+- Weekend calculation contract: https://github.com/0xileri/FaradayDesk/blob/main/docs/WEEKEND-HISTORY.md

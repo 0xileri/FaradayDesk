@@ -3,7 +3,7 @@ import { getMarket } from "@/lib/bitget-market";
 import { instruments, type Asset } from "@/lib/market";
 import { cases } from "@/lib/stress";
 import { getWeekendHistory } from "@/lib/bitget-history";
-import { compareShock } from "@/lib/weekend-history";
+import { compareShock, historyForModel } from "@/lib/weekend-history";
 export type ResearchConfig = Record<string, string | undefined>;
 export function createResearchHandlers(
   config: () => ResearchConfig,
@@ -137,14 +137,17 @@ export function createResearchHandlers(
               {
                 role: "system",
                 content:
-                  "The supplied weekendHistory, when present, is calculated by application code from Bitget token candles. You may quote its observed returns, dated windows and sample statistics as venue history, citing its source and window definition. These are calendar weekends, not matched macro events, underlying equity returns or probabilities. If sufficient is false, do not infer percentiles or rank the shock. Never describe the worst observation as a loss bound. If comparison is present, use the exact count and do not convert it to a likelihood. State small-sample and missing-window limitations. A history observation is distinct from the curated historical fact field.",
+                  "The supplied weekendHistory, when present, is calculated by application code from Bitget token candles. Its percentages are already rounded to the exact strings the interface shows: quote them character for character, and never recompute, re-round or truncate a figure. You may quote its observed returns, dated windows and sample statistics as venue history, citing its source and window definition. These are calendar weekends, not matched macro events, underlying equity returns or probabilities. If sufficient is false, do not infer percentiles or rank the shock. Never describe the worst observation as a loss bound. If comparison is present, use the exact count and do not convert it to a likelihood. State small-sample and missing-window limitations. A history observation is distinct from the curated historical fact field.",
               },
               {
                 role: "user",
                 content: JSON.stringify({
                   research: selected,
                   marketContext,
-                  weekendHistory,
+                  weekendHistory:
+                    "windows" in weekendHistory
+                      ? historyForModel(weekendHistory)
+                      : weekendHistory,
                   historicalContext: {
                     title: c.historical,
                     fact: c.fact,

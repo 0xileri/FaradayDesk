@@ -50,6 +50,10 @@ test("Railway routes preserve privacy, origin checks and persistent quota across
         RESEARCH_API_URL: "http://127.0.0.1:" + providerPort,
         RESEARCH_API_KEY: "synthetic-test-key",
         RESEARCH_MODEL: "test",
+        // This test exercises the shared budget; per-address limits have
+        // their own test and must not cut the sequence short here.
+        RESEARCH_IP_HOURLY_LIMIT: "1000",
+        DATA_IP_HOURLY_LIMIT: "1000",
       },
       stdio: ["ignore", "pipe", "pipe"],
     });

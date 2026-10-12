@@ -1,8 +1,13 @@
 import { instruments, type Asset } from "./market";
-import { calculateWeekends, DAY, WINDOW_DEFINITION } from "./weekend-history";
+import {
+  calculateWeekends,
+  DAY,
+  ResultCache,
+  WINDOW_DEFINITION,
+} from "./weekend-history";
 const source = "https://www.bitget.com/docs/catalog/market/market-data";
 export type WeekendHistory = Awaited<ReturnType<typeof fetchHistory>>;
-const cache = new Map<Asset, { expires: number; value: WeekendHistory }>();
+const cache = new ResultCache<Asset, WeekendHistory>();
 const pending = new Map<Asset, Promise<WeekendHistory>>();
 async function fetchHistory(asset: Asset) {
   const to = Math.floor(Date.now() / DAY) * DAY,
@@ -62,13 +67,19 @@ export async function getWeekendHistory(asset: Asset) {
   if (!Object.hasOwn(instruments, asset))
     throw Error("Unsupported instrument.");
   const saved = cache.get(asset);
-  if (saved && saved.expires > Date.now()) return saved.value;
+  if (saved) return saved;
+  if (cache.blocked(asset))
+    throw Error("Historical data failed recently; not retried yet.");
   const running = pending.get(asset);
   if (running) return running;
   const request = fetchHistory(asset)
     .then((value) => {
-      cache.set(asset, { expires: Date.now() + 3600000, value });
+      cache.store(asset, value);
       return value;
+    })
+    .catch((error) => {
+      cache.storeFailure(asset);
+      throw error;
     })
     .finally(() => pending.delete(asset));
   pending.set(asset, request);

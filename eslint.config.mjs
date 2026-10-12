@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Build output and local runtime state: generated, not authored here.
+    "dist/**",
+    "railway-dist/**",
+    ".sites-runtime/**",
+    ".railway-data/**",
   ]),
   {
     files: ["components/ui/**/*.{ts,tsx}", "hooks/use-mobile.ts"],

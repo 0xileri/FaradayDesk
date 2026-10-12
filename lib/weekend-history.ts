@@ -2,6 +2,7 @@ export const HOUR = 3600000;
 export const DAY = 24 * HOUR;
 export const WINDOW_DEFINITION =
   "Saturday 00:00 UTC through Monday 00:00 UTC, using twelve consecutive 4-hour stock-token trade candles. Not the US cash-market close-to-open gap.";
+export const MINIMUM_WINDOWS = 8;
 export type Weekend = {
   start: string;
   end: string;
@@ -87,7 +88,7 @@ export function calculateWeekends(raw: unknown[], from: number, to: number) {
       adversePercent,
     });
   }
-  const sufficient = windows.length >= 8;
+  const sufficient = windows.length >= MINIMUM_WINDOWS;
   return {
     windows,
     excluded,
@@ -111,6 +112,66 @@ export function calculateWeekends(raw: unknown[], from: number, to: number) {
           worstAdverse: Math.max(...windows.map((w) => w.adversePercent)),
         }
       : null,
+  };
+}
+export const HISTORY_TTL_MS = 3600000;
+export const HISTORY_FAILURE_TTL_MS = 60000;
+// A success is reusable for an hour; a failure is remembered briefly so an
+// upstream outage cannot fan a fresh burst of requests out on every click.
+export class ResultCache<K, V> {
+  private readonly values = new Map<K, { value: V; expires: number }>();
+  private readonly failures = new Map<K, number>();
+  private readonly ttlMs: number;
+  private readonly failureTtlMs: number;
+  // Plain assignment, not parameter properties: these files also run under
+  // Node's type-stripping, which rejects constructor parameter properties.
+  constructor(ttlMs = HISTORY_TTL_MS, failureTtlMs = HISTORY_FAILURE_TTL_MS) {
+    this.ttlMs = ttlMs;
+    this.failureTtlMs = failureTtlMs;
+  }
+  get(key: K, now = Date.now()) {
+    const hit = this.values.get(key);
+    if (hit && hit.expires > now) return hit.value;
+    if (hit) this.values.delete(key);
+    return undefined;
+  }
+  blocked(key: K, now = Date.now()) {
+    const until = this.failures.get(key);
+    if (until === undefined) return false;
+    if (until > now) return true;
+    this.failures.delete(key);
+    return false;
+  }
+  store(key: K, value: V, now = Date.now()) {
+    this.failures.delete(key);
+    this.values.set(key, { value, expires: now + this.ttlMs });
+  }
+  storeFailure(key: K, now = Date.now()) {
+    this.failures.set(key, now + this.failureTtlMs);
+  }
+}
+const percent = (n: number) => (n > 0 ? "+" : "") + n.toFixed(2) + "%";
+export type CalculatedHistory = ReturnType<typeof calculateWeekends>;
+// AI receives the same rounded strings the interface displays, so a figure can
+// be quoted but never truncated, re-rounded or re-derived into a different one.
+export function historyForModel<T extends CalculatedHistory>(history: T) {
+  const { windows, stats, ...rest } = history;
+  return {
+    ...rest,
+    figures:
+      "Pre-rounded display strings. Quote them exactly; never recompute or re-round them.",
+    stats: stats && {
+      tenthPercentileEndReturn: percent(stats.p10),
+      medianEndReturn: percent(stats.median),
+      ninetiethPercentileEndReturn: percent(stats.p90),
+      worstEndReturn: percent(stats.worstReturn),
+      largestDeclineToLow: stats.worstAdverse.toFixed(2) + "%",
+    },
+    windows: windows.map((w) => ({
+      weekendStarting: w.start.slice(0, 10),
+      endReturn: percent(w.returnPercent),
+      declineToLow: w.adversePercent.toFixed(2) + "%",
+    })),
   };
 }
 export function compareShock(windows: Weekend[], shock: number) {

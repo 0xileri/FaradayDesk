@@ -25,7 +25,7 @@ Task 1 in `evidence/research-benchmark.json` records the exact question/output a
 
 0:55–1:15: Inspect Disclosure. “The public question is shared. Private fields stay local by default.”
 
-1:15–1:45: Request research, then show the counter-thesis and primary sources. “Claude challenges assumptions; I verify evidence.”
+1:15–1:45: Request research, then show the counter-thesis and primary sources. “The model challenges assumptions; I verify the evidence.”
 
 1:45–2:00: Export. “A documented research decision. Humans remain in control.”
 

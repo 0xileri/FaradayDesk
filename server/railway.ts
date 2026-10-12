@@ -1,4 +1,4 @@
-import { createServer } from "node:http";
+import { createServer, type IncomingMessage } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { mkdirSync } from "node:fs";
 import { resolve, dirname, extname, sep } from "node:path";
@@ -28,6 +28,34 @@ db.exec(
 const reserve = async () =>
   !!db.prepare(reserveSQL).get(new Date().toISOString().slice(0, 10));
 const research = createResearchHandlers(() => process.env, reserve);
+// Per-address ceiling. The AI allowance and Bitget's rate limits are shared by
+// every visitor, so one caller must not be able to drain them for the rest.
+const limits = {
+  research: Number(process.env.RESEARCH_IP_HOURLY_LIMIT ?? 10),
+  data: Number(process.env.DATA_IP_HOURLY_LIMIT ?? 120),
+};
+const WINDOW_MS = 3600000;
+const seen = new Map<string, number[]>();
+const addressOf = (req: IncomingMessage) =>
+  String(req.headers["x-forwarded-for"] ?? "")
+    .split(",")[0]
+    .trim() ||
+  req.socket.remoteAddress ||
+  "unknown";
+function overLimit(bucket: keyof typeof limits, req: IncomingMessage) {
+  const limit = limits[bucket];
+  if (!Number.isFinite(limit) || limit <= 0) return false;
+  const now = Date.now();
+  if (seen.size > 5000)
+    for (const [key, times] of seen)
+      if (!times.some((t) => t > now - WINDOW_MS)) seen.delete(key);
+  const key = bucket + " " + addressOf(req);
+  const recent = (seen.get(key) ?? []).filter((t) => t > now - WINDOW_MS);
+  seen.set(key, recent);
+  if (recent.length >= limit) return true;
+  recent.push(now);
+  return false;
+}
 const publicRoot = resolve(
   dirname(fileURLToPath(import.meta.url)),
   "../client",
@@ -40,6 +68,14 @@ const mime: Record<string, string> = {
   ".png": "image/png",
   ".ico": "image/x-icon",
   ".woff2": "font/woff2",
+  ".txt": "text/plain; charset=utf-8",
+  ".xml": "application/xml; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".webmanifest": "application/manifest+json",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".avif": "image/avif",
 };
 const server = createServer(async (req, res) => {
   try {
@@ -61,6 +97,21 @@ const server = createServer(async (req, res) => {
       return;
     }
     if (url.pathname.startsWith("/api/")) {
+      const bucket =
+        req.method === "POST" && url.pathname === "/api/research"
+          ? "research"
+          : "data";
+      if (overLimit(bucket, req)) {
+        res.writeHead(429, {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+          "Retry-After": "600",
+        });
+        res.end(
+          '{"error":"Too many requests from this address. The shared demo allowance is limited; please try again later."}',
+        );
+        return;
+      }
       let response: Response;
       if (req.method === "GET" && url.pathname === "/api/research")
         response = await research.GET();
@@ -92,9 +143,11 @@ const server = createServer(async (req, res) => {
           { error: "Route or method not supported." },
           { status: 404 },
         );
+      const { "cache-control": cacheControl, ...headersOut } =
+        Object.fromEntries(response.headers);
       res.writeHead(response.status, {
-        ...Object.fromEntries(response.headers),
-        "Cache-Control": "no-store",
+        ...headersOut,
+        "Cache-Control": cacheControl ?? "no-store",
       });
       res.end(Buffer.from(await response.arrayBuffer()));
       return;

@@ -9,13 +9,10 @@ import {
   ArrowUpRight,
   Activity,
   LockKeyhole,
-  FlaskConical,
   Download,
   ChevronRight,
-  Check,
   BookOpen,
   Eye,
-  SlidersHorizontal,
   AlertTriangle,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
@@ -58,7 +55,7 @@ export default function Home() {
     [question, setQuestion] = useState(
       "Challenge my hypothetical long position. What evidence is missing, and what would invalidate the thesis?",
     );
-  const [clockNow, setClockNow] = useState(Date.now());
+  const [clockNow, setClockNow] = useState(() => Date.now());
   useEffect(() => {
     const timer = setInterval(() => setClockNow(Date.now()), 15000);
     return () => clearInterval(timer);
@@ -82,7 +79,14 @@ export default function Home() {
   }, []);
   useEffect(() => {
     const mc = (
-      document as unknown as { modelContext?: { registerTool: Function } }
+      document as unknown as {
+        modelContext?: {
+          registerTool: (
+            tool: Record<string, unknown>,
+            options?: { signal?: AbortSignal },
+          ) => unknown;
+        };
+      }
     ).modelContext;
     if (!mc) return;
     const controller = new AbortController();
@@ -224,6 +228,7 @@ export default function Home() {
   return (
     <div className="desk">
       <header className="topbar">
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- the deployed Railway target is a static single page, not Next routing. */}
         <a className="brand" href="/" aria-label="FaradayDesk home">
           <span className="brandmark">
             <Hexagon />
@@ -805,7 +810,7 @@ export default function Home() {
                   </div>
                   <div className="checkpanel">
                     <h4>Before you decide</h4>
-                    {scenario.checks.map((s, i) => (
+                    {scenario.checks.map((s) => (
                       <label key={s}>
                         <Checkbox
                           checked={checked.includes(s)}

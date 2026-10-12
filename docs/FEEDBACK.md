@@ -18,4 +18,4 @@ Record anonymous labels P1–P5; obtain permission before recording. Do not publ
 | P4 | A/B | Pending | | | | | |
 | P5 | A/B | Pending | | | | | |
 
-Ask: What would you do next? Did anything sound more certain than the evidence? What went to Claude versus Bitget? Would you return for another event, and why? Report negative feedback too.
+Ask: What would you do next? Did anything sound more certain than the evidence? What went to the AI provider versus Bitget? Would you return for another event, and why? Report negative feedback too.

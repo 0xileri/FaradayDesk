@@ -30,7 +30,7 @@ Restart the development server after migration. On Windows ARM, use x64 Node for
 ## Privacy and limitations
 Notes exist only in browser memory and disappear on refresh. Cage on excludes the entire field, not semantic anonymization. The public question is always shared: never put secrets in it. Cage off intentionally shares notes and notional with the server and provider. Hiding the ticker omits market context from AI; an independently requested refresh still sends the selected ticker to Bitget. Provider retention policies apply. Disclosure control is not a guarantee of anonymity.
 
-AI demo allowance: 25 attempts per UTC day and 200 total, enforced atomically in persistent SQLite on Railway (D1 on legacy Sites). Failed provider attempts count. One visitor could consume the shared allowance; this is a cost ceiling, not per-user fairness. The counter stores no IPs, notes or questions. Local math, history retrieval and market refresh remain available when AI is exhausted.
+AI demo allowance: 25 attempts per UTC day and 200 total, enforced atomically in persistent SQLite on Railway (D1 on legacy Sites). Failed provider attempts count. Hourly per-address ceilings (10 research, 120 market/history by default) keep one caller from draining the shared allowance or Bitget's rate limits, but the totals remain a cost ceiling, not per-user fairness. The counter stores no IPs, notes or questions. Local math, history retrieval and market refresh remain available when AI is exhausted.
 
 Loss = notional × (adverse move + assumed costs) / 100. No probabilities, VaR, backtest, issuer/redemption verification, hedge validation or USDT peg guarantee. Displayed depth is not executable liquidity. Futures/liquidation need another model. Worksheet exports omit private notes and AI commentary.
 
@@ -40,9 +40,11 @@ node --test tests/*.test.mjs
 npx tsc --noEmit
 npm run build:railway
 ```
-Twenty-seven automated checks cover arithmetic, disclosure, market validation, report rendering, provider parsing, weekend calculations and usage caps. The earlier ten-task Claude benchmark completed in 9.543–12.469 seconds, median 11.291s; it is not a Qwen benchmark. Initial exact historical-URL compliance was 5/10; deterministic source attachment was added. Qwen subsequently completed a production smoke test in 11 seconds. These are engineering observations, not human adoption or trading results. See the validation report.
+Thirty automated checks cover arithmetic, disclosure, market validation, report rendering, provider parsing, weekend calculations, pre-rounded AI figures, per-address limits and usage caps. The earlier ten-task Claude benchmark completed in 9.543–12.469 seconds, median 11.291s; it is not a Qwen benchmark. Initial exact historical-URL compliance was 5/10; deterministic source attachment was added. Qwen subsequently completed a production smoke test in 11 seconds. These are engineering observations, not human adoption or trading results. See the validation report.
 
 ## Architecture
+Figures calculated in code are rounded to their displayed strings before AI sees them, so a quoted number cannot drift from the panel beside it. `public/llms.txt` documents the read-only endpoints and how to read the figures, for agents that consume them directly.
+
 React 19, TypeScript, Vite, Node 24, persistent SQLite counter on Railway, public Bitget UTA v3 market/history APIs, server-side Qwen. The legacy Cloudflare target remains in the repository. Bitget tooling was used to discover and verify instruments during development. The deployed app calls public APIs directly; it does not host the MCP or Bitget Signal skills.
 
 ## Current hosting status

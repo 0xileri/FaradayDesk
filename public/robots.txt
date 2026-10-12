@@ -1,0 +1,8 @@
+# FaradayDesk — a public research desk. Pages are open to crawlers and agents.
+# API paths are excluded because they call rate-limited venue data on request.
+User-agent: *
+Allow: /
+Disallow: /api/
+Crawl-delay: 5
+
+Sitemap: https://faradaydesk.up.railway.app/sitemap.xml

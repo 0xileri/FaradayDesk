@@ -8,7 +8,7 @@ Evidence before conviction. A human-led decision stress-testing workspace for Bi
 - Verified mappings: NVDA → RNVDAUSDT; TSLA → RTSLAUSDT; AAPL → RAAPLUSDT. Online SPOT stock-token metadata is checked on every fetch. Quote currency: USDT.
 - Explicit public Bitget refresh: last/bid/ask, spread and 20-level displayed quote-depth with timestamps. Stale, missing or crossed data fails closed.
 - Local long unleveraged stress calculation, chosen shock/costs, loss budget and worksheet export.
-- Three curated primary-source historical lenses: Sunday Fed announcement, NVIDIA earnings and CPI. The weekend lens also retrieves observed token candle windows, with sample counts, return percentiles, dated prices and a shock comparison when enough complete windows exist. [Methodology](docs/WEEKEND-HISTORY.md). No event matching or predictive probabilities.
+- Three curated primary-source historical lenses: Sunday Fed announcement, NVIDIA earnings and CPI. Each lens also retrieves observed token candle windows — calendar weekends, the 24 hours after each dated company results release, or the 24 hours after each dated US CPI release — with sample counts, exclusions, dated prices, per-release sources, and return percentiles plus a shock comparison once at least eight windows are complete. Release dates come from NVIDIA, Tesla, Apple and BLS pages. [Methodology](docs/WEEKEND-HISTORY.md). No event-study controls or predictive probabilities.
 - Public natural-language question → Qwen 3.8 Max counter-thesis, evidence checks, missing evidence and invalidation conditions. The server attaches source links and verified weekend history when the ticker is disclosed.
 - Faraday cage omits private notes and notional from outgoing requests by default. Ticker disclosure is independent. Inspect the fields before sending.
 - Read-only WebMCP calculator. No account connection, order placement or autonomous execution.
@@ -40,7 +40,7 @@ node --test tests/*.test.mjs
 npx tsc --noEmit
 npm run build:railway
 ```
-Thirty automated checks cover arithmetic, disclosure, market validation, report rendering, provider parsing, weekend calculations, pre-rounded AI figures, per-address limits and usage caps. The earlier ten-task Claude benchmark completed in 9.543–12.469 seconds, median 11.291s; it is not a Qwen benchmark. Initial exact historical-URL compliance was 5/10; deterministic source attachment was added. Qwen subsequently completed a production smoke test in 11 seconds. These are engineering observations, not human adoption or trading results. See the validation report.
+Thirty-four automated checks cover arithmetic, disclosure, market validation, report rendering, provider parsing, weekend and event-window calculations, the curated release calendar, pre-rounded AI figures, per-address limits and usage caps. The earlier ten-task Claude benchmark completed in 9.543–12.469 seconds, median 11.291s; it is not a Qwen benchmark. Initial exact historical-URL compliance was 5/10; deterministic source attachment was added. Qwen subsequently completed a production smoke test in 11 seconds. These are engineering observations, not human adoption or trading results. See the validation report.
 
 ## Architecture
 Figures calculated in code are rounded to their displayed strings before AI sees them, so a quoted number cannot drift from the panel beside it. `public/llms.txt` documents the read-only endpoints and how to read the figures, for agents that consume them directly.

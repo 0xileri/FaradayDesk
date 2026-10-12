@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import { DeskHero } from "@/components/desk-hero";
 import { ResearchReport } from "@/components/research-report";
-import { WeekendHistory } from "@/components/weekend-history";
+import { ObservedHistory } from "@/components/observed-history";
+import type { Lens } from "@/lib/bitget-history";
 import {
   Shield,
   Hexagon,
@@ -67,7 +68,7 @@ export default function Home() {
   const payload = {
     ...makePayload(asset, scenario.id, cage, reveal, notes, size),
     question,
-    ...(reveal && scenario.id === "weekend" ? { shockPercent: shock } : {}),
+    ...(reveal ? { shockPercent: shock } : {}),
   };
   useEffect(() => {
     fetch("/api/research")
@@ -833,10 +834,10 @@ export default function Home() {
                 </div>
               </TabsContent>
               <TabsContent value="evidence">
-                <WeekendHistory
+                <ObservedHistory
                   key={asset + scenario.id}
                   asset={asset}
-                  lens={scenario.id}
+                  lens={scenario.id as Lens}
                   shock={shock}
                 />
                 <div className="evidenceintro">
@@ -928,10 +929,10 @@ export default function Home() {
                   Only an explicit AI research request sends these fields to the
                   server. The server adds the selected historical case, a fixed
                   instruction and a fresh Bitget snapshot when the ticker is
-                  disclosed. For the weekend lens, it also adds verified token
-                  history and your disclosed shock percentage. When the ticker
-                  is hidden, no token history or market snapshot is fetched or
-                  sent to AI. The public question is always shared: do not put
+                  disclosed. It also adds the verified token history for the
+                  selected lens and your disclosed shock percentage. When the
+                  ticker is hidden, no token history or market snapshot is
+                  fetched or sent to AI. The public question is always shared: do not put
                   private details in it. Your private notes are held in memory
                   and disappear on refresh. Provider retention policies still
                   apply; disclosure controls are not a guarantee of anonymity.

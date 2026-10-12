@@ -1,8 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
+  calculateEventWindows,
   calculateWeekends,
   compareShock,
+  EVENT_CANDLES,
   historyForModel,
   percentile,
   ResultCache,
@@ -67,6 +69,35 @@ test("ordering and identical duplicates do not bias samples; percentiles require
   assert.equal(percentile([0, 10, 20, 30], 0.1), 3.0000000000000004);
   const flat = h.windows.map((w) => ({ ...w, adversePercent: 5 }));
   assert.equal(compareShock(flat, 5).strictlySmaller, 0);
+});
+test("an event window measures six candles from the release anchor and keeps its citation", () => {
+  const start = Date.UTC(2026, 8, 11, 12);
+  const rows = Array.from({ length: EVENT_CANDLES }, (_, i) => [
+    start + i * 4 * HOUR,
+    100,
+    103,
+    97,
+    i === EVENT_CANDLES - 1 ? 101 : 100,
+    1,
+    100,
+  ]);
+  const spec = {
+    start,
+    candles: EVENT_CANDLES,
+    label: "US CPI for August 2026",
+    source: "https://www.bls.gov/news.release/archives/cpi_09112026.htm",
+  };
+  const h = calculateEventWindows(rows, [spec], start, start + DAY);
+  assert.equal(h.sampleSize, 1);
+  assert.ok(Math.abs(h.windows[0].returnPercent - 1) < 1e-10);
+  assert.ok(Math.abs(h.windows[0].adversePercent - 3) < 1e-10);
+  assert.equal(h.windows[0].label, spec.label);
+  assert.equal(h.windows[0].source, spec.source);
+  assert.equal(h.windows[0].end, new Date(start + DAY).toISOString());
+  // One missing candle excludes the whole release rather than shortening it.
+  const gap = calculateEventWindows(rows.slice(1), [spec], start, start + DAY);
+  assert.equal(gap.sampleSize, 0);
+  assert.equal(gap.excluded, 1);
 });
 test("figures sent to AI are pre-rounded strings, so a quoted number cannot drift", () => {
   const view = historyForModel({

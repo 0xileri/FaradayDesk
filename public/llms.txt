@@ -7,6 +7,9 @@ FaradayDesk calculates hypothetical loss for an unleveraged long spot position, 
 ## How to read the figures
 
 - Weekend window: Saturday 00:00 UTC to Monday 00:00 UTC, measured from twelve consecutive four-hour stock-token candles. This is not the US cash-market Friday-close to Monday-open gap.
+- Earnings window: the 24 hours beginning with the 20:00 UTC candle on a dated company results release, which contains a post-close US release under both daylight-saving regimes.
+- Inflation window: the 24 hours beginning with the 12:00 UTC candle on a dated US CPI release, which contains an 08:30 ET release under both daylight-saving regimes.
+- A window follows a release; it does not isolate its effect. No other driver is controlled for and there is no abnormal-return model.
 - End return compares the Saturday opening price with the final Sunday candle close. Decline to low compares the Saturday opening price with the lowest candle low inside the window.
 - A weekend with any missing or zero-volume candle is excluded whole, and the count of exclusions is always reported.
 - Percentiles and shock comparisons are withheld below eight complete windows. Samples are small either way.
@@ -18,7 +21,7 @@ FaradayDesk calculates hypothetical loss for an unleveraged long spot position, 
 Read-only, no key required, rate limited per address. Please cache responses; the weekend history is recalculated at most hourly per instrument.
 
 - GET /api/market?asset=NVDA|TSLA|AAPL — validated spot snapshot: last, bid, ask, spread, twenty-level displayed depth, source timestamps. Stale, crossed or malformed books fail closed with HTTP 503 rather than returning a partial quote.
-- GET /api/history?lens=weekend&asset=NVDA|TSLA|AAPL — observed weekend windows over the preceding 84 days: dated windows, sample size, exclusions, and percentiles when at least eight windows are complete.
+- GET /api/history?lens=weekend|earnings|inflation&asset=NVDA|TSLA|AAPL — observed windows for that lens: dated windows with their primary sources, sample size, exclusions, and percentiles when at least eight windows are complete. The weekend lens covers the preceding 84 days; the event lenses cover up to the twelve most recent dated releases.
 - GET /api/research — whether cloud AI is configured. The research POST itself is interactive, shares a capped allowance and is not for automated use.
 - GET /healthz — service health.
 

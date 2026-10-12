@@ -105,8 +105,8 @@ test("Railway routes preserve privacy, origin checks and persistent quota across
       assert.ok(!("privateNotes" in data.research));
       assert.ok(!("positionNotional" in data.research));
       assert.equal(
-        data.weekendHistory.status,
-        "Not requested: ticker hidden or lens is not weekend.",
+        data.observedHistory.status,
+        "Not requested: the ticker is hidden.",
       );
     }
     assert.equal((await post(payload)).status, 429);

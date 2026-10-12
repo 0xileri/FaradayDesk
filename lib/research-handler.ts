@@ -2,7 +2,7 @@ import { providerPayload, providerText } from "@/lib/research-provider";
 import { getMarket } from "@/lib/bitget-market";
 import { instruments, type Asset } from "@/lib/market";
 import { cases } from "@/lib/stress";
-import { getWeekendHistory } from "@/lib/bitget-history";
+import { getHistory, type Lens } from "@/lib/bitget-history";
 import { compareShock, historyForModel } from "@/lib/weekend-history";
 export type ResearchConfig = Record<string, string | undefined>;
 export function createResearchHandlers(
@@ -104,10 +104,10 @@ export function createResearchHandlers(
           ? { positionNotional: data.positionNotional }
           : {}),
       };
-      const weekendHistory =
-        data.asset === "UNDISCLOSED" || c.id !== "weekend"
-          ? { status: "Not requested: ticker hidden or lens is not weekend." }
-          : await getWeekendHistory(data.asset as Asset)
+      const observedHistory =
+        data.asset === "UNDISCLOSED"
+          ? { status: "Not requested: the ticker is hidden." }
+          : await getHistory(data.asset as Asset, c.id as Lens)
               .then((h) => ({
                 ...h,
                 comparison:
@@ -137,17 +137,17 @@ export function createResearchHandlers(
               {
                 role: "system",
                 content:
-                  "The supplied weekendHistory, when present, is calculated by application code from Bitget token candles. Its percentages are already rounded to the exact strings the interface shows: quote them character for character, and never recompute, re-round or truncate a figure. You may quote its observed returns, dated windows and sample statistics as venue history, citing its source and window definition. These are calendar weekends, not matched macro events, underlying equity returns or probabilities. If sufficient is false, do not infer percentiles or rank the shock. Never describe the worst observation as a loss bound. If comparison is present, use the exact count and do not convert it to a likelihood. State small-sample and missing-window limitations. A history observation is distinct from the curated historical fact field.",
+                  "The supplied observedHistory, when present, is calculated by application code from Bitget token candles for the selected lens: calendar weekends, the 24 hours after each dated company results release, or the 24 hours after each dated US CPI release. Its percentages are already rounded to the exact strings the interface shows: quote them character for character, and never recompute, re-round or truncate a figure. You may quote its observed returns, dated windows and sample statistics as venue history, citing its source and window definition. A window follows a release; it does not isolate its effect, and no other driver is controlled for. These are not underlying equity returns, matched macro scenarios or probabilities. If sufficient is false, do not infer percentiles or rank the shock. Never describe the worst observation as a loss bound. If comparison is present, use the exact count and do not convert it to a likelihood. State small-sample and excluded-window limitations. A history observation is distinct from the curated historical fact field.",
               },
               {
                 role: "user",
                 content: JSON.stringify({
                   research: selected,
                   marketContext,
-                  weekendHistory:
-                    "windows" in weekendHistory
-                      ? historyForModel(weekendHistory)
-                      : weekendHistory,
+                  observedHistory:
+                    "windows" in observedHistory
+                      ? historyForModel(observedHistory)
+                      : observedHistory,
                   historicalContext: {
                     title: c.historical,
                     fact: c.fact,
@@ -187,16 +187,18 @@ export function createResearchHandlers(
                 "\nSnapshot timestamp: " +
                 new Date(marketContext.timestamp).toISOString()
               : "") +
-            ("source" in weekendHistory
-              ? "\nWeekend history: " +
-                weekendHistory.source +
+            ("source" in observedHistory
+              ? "\nObserved history (" +
+                observedHistory.lens +
+                " lens): " +
+                observedHistory.source +
                 "\nWindow: " +
-                weekendHistory.windowDefinition +
-                "\nComplete weekends: " +
-                weekendHistory.sampleSize +
+                observedHistory.windowDefinition +
+                "\nComplete windows: " +
+                observedHistory.sampleSize +
                 "\nHistory retrieved: " +
-                weekendHistory.retrievedAt +
-                (weekendHistory.comparison ? '\nCode-calculated comparison: '+weekendHistory.comparison.shockPercent+'% shock exceeds the Saturday-opening-price-to-low decline in '+weekendHistory.comparison.strictlySmaller+' of '+weekendHistory.comparison.sampleSize+' weekends. This is not a comparison of ending returns and is not a probability.' : '')
+                observedHistory.retrievedAt +
+                (observedHistory.comparison ? '\nCode-calculated comparison: '+observedHistory.comparison.shockPercent+'% shock exceeds the opening-price-to-low decline in '+observedHistory.comparison.strictlySmaller+' of '+observedHistory.comparison.sampleSize+' windows. This is not a comparison of ending returns and is not a probability.' : '')
               : ""),
           marketContext,
         },
